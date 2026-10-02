@@ -1,0 +1,7 @@
+{
+  "name": "Caravan-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
