@@ -1,0 +1,130 @@
+$cream: #FFF4E9;
+$dark: #333333;
+
+.about-content {
+  --background: #{$cream};
+}
+
+.fade-title {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+
+  &.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Team ---------- */
+.team-section {
+  text-align: center;
+  width: 100%;
+  padding: 40px 20px 0;
+}
+
+.team-title {
+  font-family: Merriweather_Semi;
+  font-size: 28px;
+  color: $dark;
+  margin-bottom: 50px;
+  letter-spacing: 2px;
+}
+
+.team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.team-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #588157;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 15px;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.team-name {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: $dark;
+  text-align: center;
+  margin: 0;
+}
+
+/* ---------- About Us ---------- */
+.about-us {
+  padding: 20px;
+}
+
+.about-title {
+  font-family: Merriweather_Semi;
+  font-size: 32px;
+  color: $dark;
+  margin: 20px 0 10px;
+  text-align: center;
+}
+
+.about-subtitle {
+  font-family: InstrumentSans;
+  font-size: 16px;
+  color: $dark;
+  line-height: 1.8;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ---------- Mission & Vision ---------- */
+.mission-vision {
+  background-color: #FCF5E5;
+  padding: 60px 20px;
+  text-align: center;
+  margin-top: 30px;
+
+  ion-grid { max-width: 1140px; }
+}
+
+.mission-vision-title {
+  font-family: Merriweather_Semi;
+  font-size: 32px;
+  color: $dark;
+  margin: 0 0 20px;
+  letter-spacing: 1px;
+}
+
+.decorative-line {
+  width: 60px;
+  height: 3px;
+  background-color: $dark;
+  margin: 15px auto 25px;
+}
+
+.mission-vision-text {
+  font-family: InstrumentSans;
+  font-size: 15px;
+  color: $dark;
+  line-height: 1.8;
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto 20px;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 768px) {
+  .team-title { font-size: 24px; margin-bottom: 30px; }
+  .team-photo { width: 120px; height: 120px; }
+  .mission-vision-title { font-size: 20px; }
+}

@@ -1,0 +1,72 @@
+<ion-content class="about-content">
+
+  <!-- Team Members -->
+  <section class="team-section fade-title">
+    <h2 class="team-title">Meet the Caravan Team</h2>
+
+    <ion-grid>
+      <ion-row class="ion-justify-content-center">
+        <ion-col size="6" size-lg="4" class="team-member" *ngFor="let m of team">
+          <img [src]="m.photo" [alt]="m.name" class="team-photo" />
+          <p class="team-name">{{ m.name }}</p>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </section>
+
+  <!-- About Us -->
+  <section class="about-us fade-title" id="aboutUsSection">
+    <h2 class="about-title">About Us</h2>
+
+    <p class="about-subtitle">
+      Caravan was founded in 2026 by an aspiring entrepreneur named Iyad Michael Ghazal.
+      After recognizing a gap in the local spice market, he established the company and
+      partnered up with four of his business associates with a goal to introduce a wider-variety
+      of spices to Philippine consumers. While Caravan offers staple off-the-shelf spices and
+      seasonings such as pepper, salt, and chilies, the company also specializes in sourcing
+      rare and premium spices and bringing it here into the Philippine Market. Caravan aims to
+      provide home cooks, food enthusiasts, and professional chefs with easy access to
+      high-quality spices that are not commonly available in local stores. Caravan also provides
+      product bundles consisting of herbs and spices representing a country, dish, or culture.
+    </p>
+  </section>
+
+  <!-- Mission & Vision -->
+  <section class="mission-vision fade-title">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-lg="6">
+          <div class="mission-vision-box">
+            <h3 class="mission-vision-title">Mission</h3>
+            <div class="decorative-line"></div>
+            <p class="mission-vision-text">
+              The Caravan purpose is to address the challenge faced by cooking
+              enthusiasts in sourcing fresh and exotic products from major retailers.
+              We aim to deliver unique herbs, spices, and culinary ingredients through
+              trusted suppliers, creating product bundles that represent various countries,
+              dishes, or cultures. Lastly, we aim to provide detailed information about
+              each herb or bundle's history and offers multiple payment methods, including
+              online payments or cash, along with receipts.
+            </p>
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-lg="6">
+          <div class="mission-vision-box">
+            <h3 class="mission-vision-title">Vision</h3>
+            <div class="decorative-line"></div>
+            <p class="mission-vision-text">
+              Over the next 3-5 years, we have a vision of becoming a global business.
+              Our customer reach will expand through international shipping, multi-currency
+              payments, diversify our catalog with variety of products, launch an app dedicated
+              for mobile use (iOS/Android), lastly, we aim to have partnerships with international
+              suppliers and third-party logistics providers will strengthen our product range,
+              affordability, and fulfillment of our said mission.
+            </p>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </section>
+
+</ion-content>
