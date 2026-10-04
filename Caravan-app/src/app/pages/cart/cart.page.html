@@ -1,13 +1,346 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>cart</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <main class="cart-page">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">cart</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <header class="page-header">
+      <div>
+        <p class="page-eyebrow">Caravan Market</p>
+        <h1>Shopping Cart</h1>
+      </div>
+
+      <div class="cart-count">
+        <ion-icon name="cart-outline"></ion-icon>
+        <span>{{ cartItems.length }}</span>
+      </div>
+    </header>
+
+    <!-- CART ITEMS -->
+    <section class="cart-section">
+      <div class="section-heading">
+        <div>
+          <h2>Your Cart</h2>
+          <p>Adjust the quantity or remove products from your cart.</p>
+        </div>
+      </div>
+
+      @if (cartItems.length > 0) {
+        <div class="cart-list">
+
+          @for (item of cartItems; track item.id) {
+            <article class="cart-item">
+
+              <img
+                class="product-image"
+                [src]="item.image"
+                [alt]="item.name">
+
+              <div class="product-information">
+                <h3>{{ item.name }}</h3>
+
+                <p>
+                  {{ item.size }} · {{ item.category }}
+                </p>
+
+                <strong>
+                  {{ formatCurrency(item.price) }}
+                </strong>
+
+                <div class="item-controls">
+                  <div class="quantity-control">
+                    <button
+                      type="button"
+                      aria-label="Decrease quantity"
+                      [disabled]="item.quantity <= 1"
+                      (click)="decreaseQuantity(item)">
+                      <ion-icon name="remove"></ion-icon>
+                    </button>
+
+                    <span>{{ item.quantity }}</span>
+
+                    <button
+                      type="button"
+                      aria-label="Increase quantity"
+                      (click)="increaseQuantity(item)">
+                      <ion-icon name="add"></ion-icon>
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="delete-item-btn"
+                    (click)="openDeleteModal(item.id)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              <div class="item-subtotal">
+                {{ formatCurrency(item.price * item.quantity) }}
+              </div>
+
+            </article>
+          }
+
+        </div>
+      } @else {
+        <div class="empty-cart">
+          <ion-icon name="cart-outline"></ion-icon>
+          <h3>Your cart is empty</h3>
+          <p>Add products from the market to continue.</p>
+        </div>
+      }
+    </section>
+
+    <!-- CHECKOUT DETAILS -->
+    @if (cartItems.length > 0) {
+      <section class="checkout-section">
+
+        <h2>Order Summary</h2>
+
+        <div class="summary-row">
+          <span>Products cost</span>
+          <strong>{{ formatCurrency(productsCost) }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Shipping fee</span>
+          <strong>{{ formatCurrency(shippingFee) }}</strong>
+        </div>
+
+        <div class="summary-row discount-row">
+          <span>Discount</span>
+          <strong>-{{ formatCurrency(discountAmount) }}</strong>
+        </div>
+
+        <div class="field-group">
+          <label for="voucher">Voucher</label>
+
+          <select
+            id="voucher"
+            [(ngModel)]="selectedVoucherId"
+            name="voucher">
+            <option [ngValue]="null">Select a voucher</option>
+
+            @for (voucher of vouchers; track voucher.id) {
+              <option [ngValue]="voucher.id">
+                {{ voucher.code }}
+              </option>
+            }
+          </select>
+
+          @if (selectedVoucher) {
+            <p class="field-description">
+              {{ selectedVoucher.description }}
+            </p>
+          }
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="total-row">
+          <span>Total</span>
+          <strong>{{ formatCurrency(totalCost) }}</strong>
+        </div>
+
+        <div class="field-group">
+          <label for="address">Delivery address</label>
+
+          <select
+            id="address"
+            [(ngModel)]="selectedAddressId"
+            name="address">
+            <option [ngValue]="null">Select an address</option>
+
+            @for (address of addresses; track address.id) {
+              <option [ngValue]="address.id">
+                {{ address.street }}, {{ address.city }},
+                {{ address.zipCode }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="payment-section">
+          <h3>Payment Method</h3>
+
+          <button
+            type="button"
+            class="payment-option"
+            [class.selected]="selectedPaymentMethod === 'card'"
+            (click)="selectPaymentMethod('card')">
+            <span class="payment-icon">
+              <ion-icon name="card-outline"></ion-icon>
+            </span>
+
+            <span class="payment-copy">
+              <strong>Card Payment</strong>
+              <small>Debit or credit card</small>
+            </span>
+
+            <span class="selection-circle"></span>
+          </button>
+
+          <button
+            type="button"
+            class="payment-option"
+            [class.selected]="selectedPaymentMethod === 'cash'"
+            (click)="selectPaymentMethod('cash')">
+            <span class="payment-icon">
+              <ion-icon name="cash-outline"></ion-icon>
+            </span>
+
+            <span class="payment-copy">
+              <strong>Cash on Delivery</strong>
+              <small>Pay when the order arrives</small>
+            </span>
+
+            <span class="selection-circle"></span>
+          </button>
+        </div>
+
+        @if (!canCheckout) {
+          <p class="checkout-note">
+            Select a delivery address and payment method to continue.
+          </p>
+        }
+
+        <button
+          type="button"
+          class="checkout-btn"
+          [disabled]="!canCheckout"
+          (click)="openCheckoutModal()">
+          Checkout · {{ formatCurrency(totalCost) }}
+        </button>
+
+      </section>
+    }
+
+  </main>
+
+  <!-- DELETE CONFIRMATION -->
+  @if (showDeleteModal) {
+    <div
+      class="modal-overlay"
+      (click)="cancelDeleteItem()">
+
+      <div
+        class="modal-box"
+        (click)="$event.stopPropagation()">
+
+        <div class="warning-icon">
+          <ion-icon name="trash-outline"></ion-icon>
+        </div>
+
+        <h2>Remove Item?</h2>
+
+        <p>
+          Are you sure you want to remove this item from your cart?
+        </p>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="danger-btn"
+            (click)="confirmDeleteItem()">
+            Remove
+          </button>
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="cancelDeleteItem()">
+            Cancel
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- CHECKOUT CONFIRMATION -->
+  @if (showCheckoutModal) {
+    <div
+      class="modal-overlay"
+      (click)="cancelCheckout()">
+
+      <div
+        class="modal-box"
+        (click)="$event.stopPropagation()">
+
+        <div class="checkout-modal-icon">
+          <ion-icon name="cart-outline"></ion-icon>
+        </div>
+
+        <h2>Proceed to Checkout?</h2>
+
+        <p>
+          Your order total is
+          <strong>{{ formatCurrency(totalCost) }}</strong>.
+        </p>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="primary-btn"
+            (click)="confirmCheckout()">
+            Place Order
+          </button>
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="cancelCheckout()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- CHECKOUT PROCESSING / SUCCESS -->
+  @if (showCheckoutResultModal) {
+    <div class="modal-overlay">
+
+      <div class="modal-box result-modal">
+
+        @if (isProcessingCheckout) {
+          <div class="spinner"></div>
+
+          <h2>Processing Order</h2>
+
+          <p>
+            Please wait while your temporary order is processed.
+          </p>
+        }
+
+        @if (checkoutSuccessful) {
+          <div class="success-icon">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </div>
+
+          <h2>Order Placed Successfully</h2>
+
+          <p>
+            Thank you for your purchase.
+          </p>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="primary-btn"
+              (click)="continueShopping()">
+              Continue Shopping
+            </button>
+
+            <button
+              type="button"
+              class="secondary-btn"
+              (click)="viewOrders()">
+              View Orders
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
 </ion-content>
