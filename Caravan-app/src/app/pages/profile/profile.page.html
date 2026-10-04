@@ -1,13 +1,594 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>profile</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <div class="profile-wrapper">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">profile</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <ion-icon name="person"></ion-icon>
+      </div>
+
+      <div class="profile-name">
+        {{ customerName }}
+      </div>
+
+      <div class="profile-email">
+        {{ customerEmail }}
+      </div>
+    </div>
+
+    <div class="profile-tabs">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'overview'"
+        (click)="activeTab = 'overview'">
+        Overview
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'payment'"
+        (click)="activeTab = 'payment'">
+        Payment
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'addresses'"
+        (click)="activeTab = 'addresses'">
+        Addresses
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'vouchers'"
+        (click)="activeTab = 'vouchers'">
+        Vouchers
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'wishlist'"
+        (click)="activeTab = 'wishlist'">
+        Wishlist
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'orders'"
+        (click)="activeTab = 'orders'">
+        Order History
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn logout-tab"
+        [class.active]="activeTab === 'logout'"
+        (click)="activeTab = 'logout'">
+        Logout
+      </button>
+    </div>
+
+    <div class="profile-content">
+
+      <!-- ACCOUNT OVERVIEW -->
+      @if (activeTab === 'overview') {
+        <section class="content-section">
+          <h2>Account Overview</h2>
+
+          <form>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">E-mail Address</label>
+                <input
+                  id="email"
+                  type="email"
+                  [(ngModel)]="profile.email"
+                  name="email"
+                  [readonly]="!isEditingProfile">
+              </div>
+
+              <div class="form-group">
+                <label for="birthdate">Birthdate</label>
+                <input
+                  id="birthdate"
+                  type="date"
+                  [(ngModel)]="profile.birthdate"
+                  name="birthdate"
+                  [readonly]="!isEditingProfile">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input
+                  id="firstName"
+                  type="text"
+                  [(ngModel)]="profile.firstName"
+                  name="firstName"
+                  [readonly]="!isEditingProfile">
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  [(ngModel)]="profile.lastName"
+                  name="lastName"
+                  [readonly]="!isEditingProfile">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                [(ngModel)]="profile.password"
+                name="password"
+                placeholder="••••••••"
+                [readonly]="!isEditingProfile">
+            </div>
+
+            <p class="form-note">
+              Leave the password field blank if there is no password change.
+            </p>
+
+            <div class="action-buttons">
+              @if (!isEditingProfile) {
+                <button
+                  type="button"
+                  class="primary-btn"
+                  (click)="startEditProfile()">
+                  Edit Profile
+                </button>
+              }
+
+              @if (isEditingProfile) {
+                <button
+                  type="button"
+                  class="primary-btn"
+                  (click)="saveProfile()">
+                  Save Changes
+                </button>
+
+                <button
+                  type="button"
+                  class="secondary-btn"
+                  (click)="cancelEditProfile()">
+                  Cancel
+                </button>
+              }
+            </div>
+          </form>
+        </section>
+      }
+
+      <!-- PAYMENT METHODS -->
+      @if (activeTab === 'payment') {
+        <section class="content-section">
+          <h2>Payment Methods</h2>
+
+          <button
+            type="button"
+            class="add-btn"
+            (click)="openCardModal()">
+            Add a New Card
+          </button>
+
+          <div class="card-list">
+            @for (card of paymentCards; track card.id) {
+              <div class="payment-card">
+                <div>
+                  <strong>{{ card.holder }}</strong>
+                  <p>•••• •••• •••• {{ card.lastFour }}</p>
+                  <small>Expires {{ card.expiry }}</small>
+                </div>
+
+                <button
+                  type="button"
+                  class="delete-outline-btn"
+                  (click)="deleteCard(card.id)">
+                  Delete
+                </button>
+              </div>
+            }
+
+            @if (paymentCards.length === 0) {
+              <div class="empty-message">
+                No payment methods added.
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ADDRESSES -->
+      @if (activeTab === 'addresses') {
+        <section class="content-section">
+          <h2>My Addresses</h2>
+
+          <button
+            type="button"
+            class="add-btn"
+            (click)="openAddressModal()">
+            Add a New Address
+          </button>
+
+          <div class="card-list">
+            @for (address of addresses; track address.id) {
+              <div class="address-card">
+                <div class="address-information">
+                  <strong>{{ address.street }}</strong>
+                  <p>{{ address.city }}, {{ address.zipCode }}</p>
+                </div>
+
+                <div class="card-actions">
+                  <button
+                    type="button"
+                    class="edit-outline-btn"
+                    (click)="editAddress(address.id)">
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    class="delete-outline-btn"
+                    (click)="deleteAddress(address.id)">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (addresses.length === 0) {
+              <div class="empty-message">
+                No addresses added.
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- VOUCHERS -->
+      @if (activeTab === 'vouchers') {
+        <section class="content-section">
+          <h2>My Vouchers</h2>
+
+          <div class="voucher-card">
+            <div>
+              <strong>WELCOME10</strong>
+              <p>10% discount on your next order</p>
+            </div>
+
+            <span class="voucher-status">
+              Unused
+            </span>
+          </div>
+        </section>
+      }
+
+      <!-- WISHLIST -->
+      @if (activeTab === 'wishlist') {
+        <section class="content-section">
+          <h2>My Wishlist</h2>
+
+          <div class="wishlist-list">
+            @for (item of wishlistItems; track item.id) {
+              <div class="wishlist-card">
+                <img
+                  [src]="item.image"
+                  [alt]="item.name"
+                  class="wishlist-image">
+
+                <div class="wishlist-information">
+                  <strong>{{ item.name }}</strong>
+                  <span>₱{{ item.price }}</span>
+
+                  <div class="wishlist-actions">
+                    <button
+                      type="button"
+                      class="primary-btn small-btn"
+                      (click)="viewWishlistItem(item.id)">
+                      Go To
+                    </button>
+
+                    <button
+                      type="button"
+                      class="danger-btn small-btn"
+                      (click)="deleteWishlistItem(item.id)">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (wishlistItems.length === 0) {
+              <div class="empty-message">
+                Your wishlist is empty.
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ORDER HISTORY -->
+      @if (activeTab === 'orders') {
+        <section class="content-section">
+          <h2>Order History</h2>
+
+          <div class="simple-action-box">
+            <p>View your previous orders and order details.</p>
+
+            <button
+              type="button"
+              class="primary-btn"
+              (click)="viewOrders()">
+              View Your Orders
+            </button>
+          </div>
+        </section>
+      }
+
+      <!-- LOGOUT -->
+      @if (activeTab === 'logout') {
+        <section class="content-section">
+          <h2>Logout</h2>
+
+          <div class="simple-action-box">
+            <p>Are you sure you want to logout?</p>
+
+            <button
+              type="button"
+              class="primary-btn"
+              (click)="logout()">
+              Logout
+            </button>
+          </div>
+        </section>
+      }
+
+    </div>
+  </div>
+
+  <!-- ADD CARD MODAL -->
+  @if (showCardModal) {
+    <div class="modal-overlay" (click)="closeCardModal()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Add a New Card</h3>
+
+          <button
+            type="button"
+            class="close-btn"
+            (click)="closeCardModal()">
+            ×
+          </button>
+        </div>
+
+        <form (ngSubmit)="saveCard()">
+          <div class="form-group">
+            <label for="cardHolder">Name on Card</label>
+            <input
+              id="cardHolder"
+              type="text"
+              [(ngModel)]="newCard.holder"
+              name="cardHolder"
+              placeholder="John Doe Monroe"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="cardNumber">Card Number</label>
+            <input
+              id="cardNumber"
+              type="text"
+              [(ngModel)]="newCard.number"
+              name="cardNumber"
+              placeholder="4532 1234 5678 8890"
+              maxlength="19"
+              required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiryDate">Expiry Date</label>
+              <input
+                id="expiryDate"
+                type="text"
+                [(ngModel)]="newCard.expiry"
+                name="expiryDate"
+                placeholder="MM/YY"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="cvv">CVV</label>
+              <input
+                id="cvv"
+                type="password"
+                [(ngModel)]="newCard.cvv"
+                name="cvv"
+                placeholder="123"
+                maxlength="4"
+                required>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="primary-btn">
+              Save Card
+            </button>
+
+            <button
+              type="button"
+              class="secondary-btn"
+              (click)="closeCardModal()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ADD/EDIT ADDRESS MODAL -->
+  @if (showAddressModal) {
+    <div class="modal-overlay" (click)="closeAddressModal()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>
+            {{ editingAddressId !== null ? 'Edit Address' : 'Add a New Address' }}
+          </h3>
+
+          <button
+            type="button"
+            class="close-btn"
+            (click)="closeAddressModal()">
+            ×
+          </button>
+        </div>
+
+        <form (ngSubmit)="saveAddress()">
+          <div class="form-group">
+            <label for="streetAddress">Street Address</label>
+            <input
+              id="streetAddress"
+              type="text"
+              [(ngModel)]="newAddress.street"
+              name="streetAddress"
+              placeholder="4009 Wooden Street"
+              required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input
+                id="city"
+                type="text"
+                [(ngModel)]="newAddress.city"
+                name="city"
+                placeholder="Quezon City"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="zipCode">Zip Code</label>
+              <input
+                id="zipCode"
+                type="text"
+                [(ngModel)]="newAddress.zipCode"
+                name="zipCode"
+                placeholder="1803"
+                required>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="primary-btn">
+              {{ editingAddressId !== null ? 'Save Changes' : 'Save Address' }}
+            </button>
+
+            <button
+              type="button"
+              class="secondary-btn"
+              (click)="closeAddressModal()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (showSaveProfileModal) {
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <h3>Save Changes?</h3>
+        <p>
+          Do you want to save the changes made to your account?
+        </p>
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="primary-btn"
+            (click)="confirmSaveProfile()">
+            Save
+          </button>
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="cancelSaveProfile()">
+            Continue Editing
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showDeleteAddressModal) {
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <h3>Delete Address?</h3>
+
+        <p>
+          Are you sure you want to delete this address?
+          This action cannot be undone.
+        </p>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="danger-btn"
+            (click)="confirmDeleteAddress()">
+            Delete
+          </button>
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="cancelDeleteAddress()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showLogoutModal) {
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <h3>Logout?</h3>
+
+        <p>
+          Are you sure you want to logout?
+        </p>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="danger-btn"
+            (click)="confirmLogout()">
+            Logout
+          </button>
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="cancelLogout()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </ion-content>
