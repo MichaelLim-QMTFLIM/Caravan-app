@@ -11,6 +11,10 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'about',
+    loadComponent: () => import('./pages/aboutus/aboutus.page').then((m) => m.AboutPage),
+  },
+  {
     path: 'store',
     loadComponent: () => import('./pages/store/store.page').then( m => m.StorePage)
   },
@@ -21,10 +25,6 @@ export const routes: Routes = [
   {
     path: 'cart',
     loadComponent: () => import('./pages/cart/cart.page').then( m => m.CartPage)
-  },
-  {
-    path: 'checkout',
-    loadComponent: () => import('./pages/checkout/checkout.page').then( m => m.CheckoutPage)
   },
   {
     path: 'profile',

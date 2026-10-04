@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonCol, IonRow, IonGrid} from '@ionic/angular';
 
 @Component({
   selector: 'app-aboutus',
   templateUrl: './aboutus.page.html',
   styleUrls: ['./aboutus.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonContent, IonHeader, IonTitle, IonToolbar, IonCol, IonRow, IonGrid],
 })
 export class AboutPage implements AfterViewInit {
   team = [
