@@ -56,24 +56,24 @@ interface HomeProduct {
 export class HomePage implements AfterViewInit {
   readonly features: HomeFeature[] = [
     {
-      icon: 'assets/Images/Quality.png',
-      title: 'Quality Ingredients',
-      text: 'Carefully selected ingredients for your kitchen.',
+      icon: 'assets/Images/Cart.png',
+      title: 'PURCHASE SECURELY',
+      text: 'Buy your herbs and spices with our secure and easy payment process.',
     },
     {
-      icon: 'assets/Images/Freshness.png',
-      title: 'Freshness You Can Trust',
-      text: 'Fresh products packed with care.',
+      icon: 'assets/Images/Truck.png',
+      title: 'SHIPPED TO YOU',
+      text: 'Get your package safely delivered to your doorstep.',
     },
     {
-      icon: 'assets/Images/Variety.png',
-      title: 'A Wide Variety',
-      text: 'Discover ingredients for every kind of recipe.',
+      icon: 'assets/Images/Checklist.png',
+      title: 'DEDICATED RECIPES',
+      text: 'We offer a list of recipes you can cook using our herbs and spices.',
     },
     {
-      icon: 'assets/Images/Delivery.png',
-      title: 'Convenient Shopping',
-      text: 'Find your kitchen essentials in one place.',
+      icon: 'assets/Images/Wallet.png',
+      title: 'SAVE MORE',
+      text: 'Buying bundles will cost less than buying them individually.',
     },
   ];
 
