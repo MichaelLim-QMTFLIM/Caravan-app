@@ -6,17 +6,25 @@
     </div>
 
     <div class="orders-filters">
-      <select [(ngModel)]="sortOption">
-        <option value="date-desc">Latest Date</option>
-        <option value="date-asc">Oldest Date</option>
-      </select>
+      <div class="filter-group">
+        <label>Order By</label>
 
-      <select [(ngModel)]="priceFilter">
-        <option value="all">All Prices</option>
-        <option value="0-500">₱0 - ₱500</option>
-        <option value="501-1000">₱501 - ₱1000</option>
-        <option value="1001+">₱1001+</option>
-      </select>
+        <select [(ngModel)]="sortOption">
+          <option value="date-desc">Latest Date</option>
+          <option value="date-asc">Oldest Date</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Filter Price</label>
+
+        <select [(ngModel)]="priceFilter">
+          <option value="all">All Prices</option>
+          <option value="0-500">₱0 - ₱500</option>
+          <option value="501-1000">₱501 - ₱1000</option>
+          <option value="1001+">₱1001+</option>
+        </select>
+      </div>
     </div>
 
     <div class="orders-list">
@@ -56,20 +64,21 @@
   @if(showReceiptModal) {
     <div class="modal-overlay">
       <div class="modal-box">
+      <h2>
+        Order #{{ selectedOrder?.orderId }}
+      </h2>
 
-        <h2>
-          Order #{{ selectedOrder?.orderId }}
-        </h2>
-
+      <div class="receipt-details">
         <p>
-          Status:
+          <strong>Status:</strong>
           {{ selectedOrder?.status }}
         </p>
 
         <p>
-          Total:
+          <strong>Total:</strong>
           ₱{{ selectedOrder?.total }}
         </p>
+      </div>
 
         <div class="modal-actions">
 
@@ -90,7 +99,6 @@
   }
 
   @if(showRefundModal) {
-
     <div class="modal-overlay">
       <div class="modal-box">
         <h2>Refund Request</h2>

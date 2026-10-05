@@ -49,6 +49,18 @@ export class OrderhistoryPage {
       date: '01 Oct 2026',
       status: 'Shipped',
       total: 550
+    },
+    {
+      orderId: 5,
+      date: '01 Oct 2026',
+      status: 'Delivered',
+      total: 684
+    },
+    {
+      orderId: 5,
+      date: '01 Oct 2026',
+      status: 'Shipped',
+      total: 510.30
     }
   ];
 
