@@ -1,13 +1,124 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Orderhistory</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Orderhistory</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="orders-page">
+    <div class="orders-header">
+      <h1>Your Order History</h1>
+    </div>
+
+    <div class="orders-filters">
+      <select [(ngModel)]="sortOption">
+        <option value="date-desc">Latest Date</option>
+        <option value="date-asc">Oldest Date</option>
+      </select>
+
+      <select [(ngModel)]="priceFilter">
+        <option value="all">All Prices</option>
+        <option value="0-500">₱0 - ₱500</option>
+        <option value="501-1000">₱501 - ₱1000</option>
+        <option value="1001+">₱1001+</option>
+      </select>
+    </div>
+
+    <div class="orders-list">
+      @for (order of orders; track order.orderId) {
+        <div class="order-card">
+          <div class="order-card-header">
+            <div>
+              <h3>Order #{{ order.orderId }}</h3>
+              <p>{{ order.date }}</p>
+            </div>
+
+            <span
+              class="status-badge"
+              [class.confirmed]="order.status === 'Confirmed'"
+              [class.shipped]="order.status === 'Shipped'"
+              [class.delivered]="order.status === 'Delivered'">
+
+              {{ order.status }}
+            </span>
+          </div>
+          <div class="order-card-body">
+            <div class="order-total">
+              ₱{{ order.total }}
+            </div>
+
+            <button
+              class="receipt-btn"
+              (click)="openReceipt(order)">
+              View Receipt
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if(showReceiptModal) {
+    <div class="modal-overlay">
+      <div class="modal-box">
+
+        <h2>
+          Order #{{ selectedOrder?.orderId }}
+        </h2>
+
+        <p>
+          Status:
+          {{ selectedOrder?.status }}
+        </p>
+
+        <p>
+          Total:
+          ₱{{ selectedOrder?.total }}
+        </p>
+
+        <div class="modal-actions">
+
+          <button
+            class="refund-btn"
+            (click)="openRefundModal()">
+            Request Refund
+          </button>
+
+          <button
+            class="cancel-btn"
+            (click)="closeReceipt()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if(showRefundModal) {
+
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <h2>Refund Request</h2>
+
+        <input
+          type="text"
+          placeholder="Subject">
+
+        <textarea
+          rows="5"
+          placeholder="Reason">
+        </textarea>
+
+        <div class="modal-actions">
+          <button
+            class="submit-btn"
+            (click)="submitRefund()">
+            Submit
+          </button>
+
+          <button
+            class="cancel-btn"
+            (click)="closeRefundModal()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
 </ion-content>

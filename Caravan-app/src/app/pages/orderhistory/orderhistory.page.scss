@@ -1,0 +1,154 @@
+:host {
+  --caravan-brown: #6f4e37;
+  --caravan-green: #4f7658;
+  --caravan-cream: #faf4ed;
+}
+
+ion-content {
+  --background: #f4f6fb;
+}
+
+.orders-page {
+  width: calc(100% - 32px);
+  max-width: 650px;
+  margin: 16px auto;
+}
+
+.orders-header {
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0;
+    color: #333;
+    font-family: Georgia, serif;
+    font-size: 30px;
+  }
+}
+
+.orders-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  select {
+    flex: 1;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 0 12px;
+  }
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.order-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,.08);
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.order-card-header h3 {
+  margin: 0;
+}
+
+.order-card-header p {
+  margin: 4px 0 0;
+  color: #777;
+}
+
+.status-badge {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.confirmed,
+.shipped,
+.delivered {
+  background: #eaf6ed;
+  color: #4f7658;
+}
+
+.order-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-total {
+  color: var(--caravan-brown);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.receipt-btn {
+  border: none;
+  background: var(--caravan-green);
+  color: white;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,.5);
+  z-index: 9999;
+}
+
+.modal-box {
+  width: calc(100% - 40px);
+  max-width: 380px;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+}
+
+.modal-box input,
+.modal-box textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+.refund-btn,
+.submit-btn {
+  border: none;
+  background: #4f7658;
+  color: white;
+  border-radius: 10px;
+  height: 44px;
+}
+
+.cancel-btn {
+  border: none;
+  background: #e5e5e5;
+  border-radius: 10px;
+  height: 44px;
+}
