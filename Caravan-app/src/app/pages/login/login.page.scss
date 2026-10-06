@@ -1,0 +1,327 @@
+ion-content {
+  --background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url('/assets/images/background.png') center / cover no-repeat fixed;
+}
+
+.main-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 100%;
+  padding: 1rem 4rem 1rem 1rem;
+  box-sizing: border-box;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 485px;
+  padding: 2rem 2.5rem;
+  border-radius: 20px;
+  background-color: rgba(194, 140, 94, 0.45);
+  box-shadow: 0 4px 4px 5px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.form-title {
+  margin: 0 0 0.5rem;
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.form-subtitle {
+  margin: 0 0 2rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-input {
+  width: 100%;
+  height: 44px;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #f6f6f6;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  color: #333;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.3);
+  }
+
+  &::placeholder {
+    color: #999;
+  }
+}
+
+.password-container {
+  position: relative;
+  width: 100%;
+
+  .form-input {
+    padding-right: 45px;
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  padding: 5px;
+  border: none;
+  background: transparent;
+  color: #594137;
+  cursor: pointer;
+  font-size: 1.1rem;
+
+  &:hover {
+    color: #6f4e37;
+  }
+}
+
+.register-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  margin-top: 0.5rem;
+  padding: 0.95rem;
+  border: none;
+  border-radius: 23px;
+  background: #594137;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #6d4c41 0%, #5c4033 100%);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.login-link {
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  text-align: center;
+
+  a {
+    color: #ffcd60;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #ffe580;
+      text-decoration: underline;
+    }
+  }
+}
+
+.error-message {
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  background-color: #d32f2f;
+  color: white;
+  font-size: 0.9rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.api-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  color: white;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 15px 0;
+
+  h6 {
+    margin: 0 12px;
+    color: white;
+    white-space: nowrap;
+  }
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(243, 243, 243, 0.911);
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  .form-card {
+    padding: 1.25rem;
+    border-radius: 15px;
+  }
+
+  .form-title {
+    margin-bottom: 0.3rem;
+    font-size: 1.3rem;
+  }
+
+  .form-subtitle {
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .register-form {
+    gap: 0.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .form-input {
+    height: 38px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .register-btn {
+    height: 38px;
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+  }
+
+  .login-link {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-container {
+    padding: 0.5rem;
+  }
+
+  .form-card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .form-title {
+    margin-bottom: 0.2rem;
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+  }
+
+  .form-subtitle {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .register-form {
+    gap: 0.7rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-input {
+    height: 36px;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .register-btn {
+    height: 36px;
+    margin-top: 0.2rem;
+    font-size: 0.8rem;
+  }
+
+  .login-link {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+
+ion-content {
+  --background: transparent;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url('/assets/Images/Login_Background.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+@media (max-width: 768px) {
+  ion-content {
+    background-position: 30% center;
+  }
+}

@@ -40,7 +40,7 @@ export const routes: Routes = [
   },
   {
     path: 'faqs',
-    loadComponent: () => import('./pages/faqs/faqs.page').then( m => m.FAQsPage)
+    loadComponent: () => import('./pages/faqs/faqs.page').then( m => m.FaqPage)
   },
   {
     path: 'orderhistory',

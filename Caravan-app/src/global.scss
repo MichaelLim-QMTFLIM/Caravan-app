@@ -35,3 +35,25 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+
+:root {
+  --color-primary: #6F4E37;
+  --color-secondary: #FAF4ED;
+  --color-green-card: #4F7658;
+  --color-image-bg: #EAE3D9;
+  --color-text-light: #333333;
+}
+
+@font-face {
+  font-family: Merriweather_Semi;
+  src: url("/assets/Fonts/Merriweather/Merriweather_120pt-SemiBold.ttf");
+}
+@font-face {
+  font-family: InstrumentSans_Semi;
+  src: url("/assets/Fonts/InstrumentSans/InstrumentSans-SemiBold.ttf");
+}
+@font-face {
+  font-family: InstrumentSans;
+  src: url("/assets/Fonts/InstrumentSans/InstrumentSans-Regular.ttf");
+}

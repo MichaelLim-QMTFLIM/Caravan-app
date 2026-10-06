@@ -1,13 +1,78 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>FAQs</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <main class="faq-page">
+    <h1>Customer Support &amp; Contact</h1>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">FAQs</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <div class="faq-layout">
+      <section class="faq-section" aria-labelledby="self-service-heading">
+        <h2 id="self-service-heading">Self-Service FAQs</h2>
+
+        <div class="faq-list">
+          @for (item of faqs; track item.question; let i = $index) {
+            <article class="faq-item" [class.is-open]="openIndex === i">
+              <button
+                class="faq-question"
+                type="button"
+                [attr.aria-expanded]="openIndex === i"
+                (click)="toggle(i)"
+              >
+                <span>{{ item.question }}</span>
+                <span class="faq-chevron" aria-hidden="true"></span>
+              </button>
+              <div class="faq-answer">
+                <p>{{ item.answer }}</p>
+              </div>
+            </article>
+          }
+        </div>
+
+        <p class="order-note">
+          For order issues, check your
+          <a routerLink="/user/order">Order History</a> first.
+        </p>
+      </section>
+
+      <section class="contact-section" aria-labelledby="contact-heading">
+        <h2 id="contact-heading">Contact Our Team</h2>
+        <div class="contact-card">
+          <div class="contact-option">
+            <span class="contact-icon" aria-hidden="true">&#128172;</span>
+            <div>
+              <h3>Live Chat</h3>
+              <p>Connect with a support agent instantly.</p>
+              <a class="contact-button" href="mailto:CaravanSupport@gmail.com">Start Chat</a>
+            </div>
+          </div>
+
+          <div class="contact-option">
+            <span class="contact-icon" aria-hidden="true">&#9993;</span>
+            <div>
+              <h3>Email Us</h3>
+              <p>Expect a response within 24 hours.</p>
+              <a class="contact-button" href="mailto:Caravan@gmail.com">Send Email</a>
+            </div>
+          </div>
+
+          <div class="contact-option">
+            <span class="contact-icon" aria-hidden="true">&#9742;</span>
+            <div>
+              <h3>Call Us</h3>
+              <p>Available Mon-Fri, 9am - 5pm EST.</p>
+              <a class="contact-button" href="tel:+639123456789">Call +63 912 345 6789</a>
+            </div>
+          </div>
+
+          <div class="contact-option contact-location">
+            <span class="contact-icon" aria-hidden="true">&#9673;</span>
+            <div>
+              <h3>Our Location</h3>
+              <p>
+                Visit our physical store in Philippines<br />
+                E. Rodriguez, Cubao, Philippines
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
 </ion-content>
