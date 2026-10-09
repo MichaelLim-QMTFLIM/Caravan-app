@@ -1,13 +1,105 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>store</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">store</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content>
+    <!-- Search & filter bar -->
+    <div class="function-bar">
+      <form class="search-container" (ngSubmit)="search()">
+        <div class="search-field">
+          <input type="text" class="searchbar" name="search" placeholder="Search for products..."
+                 [(ngModel)]="searchInput" />
+          <button class="searchbtn" type="submit" aria-label="Search">⌕</button>
+        </div>
+
+        <div class="category-filter">
+          <label for="product_category">Category:</label>
+          <select class="category-dropdown" id="product_category" name="product_category"
+                  [(ngModel)]="selectedCategory" (ngModelChange)="applyFilters()"
+                  [disabled]="currentTab === 'bundles'">
+            <option value="">All Categories</option>
+            @for (g of categoryGroups; track g.name) {
+              <optgroup [label]="g.name">
+                @for (sub of g.subs; track sub) { <option [value]="sub">{{ sub }}</option> }
+              </optgroup>
+            }
+          </select>
+        </div>
+
+        <div class="country-filter">
+          <label for="product_country">Filter by Country:</label>
+          <select class="country-dropdown" id="product_country" name="product_country"
+                  [(ngModel)]="selectedCountry" (ngModelChange)="applyFilters()"
+                  [disabled]="currentTab === 'bundles'">
+            <option value="">All Countries</option>
+            @for (c of countries; track c) { <option [value]="c">{{ c }}</option> }
+          </select>
+        </div>
+      </form>
+    </div>
+
+    <div class="main-product-section">
+
+      <!-- Tabs -->
+      <div class="tabs-container">
+        <button class="tab-button" type="button" [class.active]="currentTab === 'products'"
+                (click)="switchTab('products')">Products</button>
+        <button class="tab-button" type="button" [class.active]="currentTab === 'bundles'"
+                (click)="switchTab('bundles')">Bundles</button>
+      </div>
+
+      @if (loading) {
+        <div class="content-loader">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Loading products...</p>
+        </div>
+      }
+
+      @if (currentTab === 'products') {
+        <h1 class="section-title">Products</h1>
+        <div class="product-section">
+          @for (p of filteredProducts; track p.product_id) {
+            <div class="product-card" fadeIn (click)="openItem(p)">
+              <img class="product-image" [src]="p.product_image" [alt]="p.product_name" />
+              <div class="product-info">
+                <h3 class="product-name">{{ p.product_name }}</h3>
+                <p class="product-price">₱{{ (+p.product_price || 0).toFixed(2) }}/oz.</p>
+              </div>
+            </div>
+          }
+
+          @if (!loading && filteredProducts.length === 0) {
+            <div class="noitem-container">
+              <div class="noitem-content">
+                <img src="assets/Images/ItemNotFound_nobg.png" alt="No items found" class="noitem-image" />
+                <h1>Sorry, we couldn't find any products matching your search.</h1>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <h1 class="section-title">Bundles</h1>
+        <div class="product-section">
+          @for (b of filteredBundles; track b.product_id) {
+            <div class="product-card" fadeIn (click)="openItem(b)">
+              <img class="product-image" [src]="b.product_image" [alt]="b.product_name" />
+              <div class="product-info">
+                <h3 class="product-name">{{ b.product_name }}</h3>
+                <p class="product-price">₱{{ (+b.product_price || 0).toFixed(2) }}/oz.</p>
+              </div>
+            </div>
+          }
+
+          @if (!loading && filteredBundles.length === 0) {
+            <div class="noitem-container">
+              <div class="noitem-content">
+                <img src="assets/Images/ItemNotFound_nobg.png" alt="No items found" class="noitem-image" />
+                <h1>Sorry, we couldn't find any bundles matching your search.</h1>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="product-footer">
+        <p>You've reached the end of our collection. Check back soon for more rare finds!</p>
+      </div>
+    </div>
+  </ion-content>

@@ -1,0 +1,137 @@
+/* Fonts (root-relative: assumes fonts live in src/assets/Fonts and the app is served from "/") */
+@font-face { font-family: EncodeSans_GC_Semi; src: url('/assets/Fonts/EncodeSans_SC/EncodeSansSC-SemiBold.ttf'); }
+@font-face { font-family: Merriweather_Semi;  src: url('/assets/Fonts/Merriweather/Merriweather_120pt-SemiBold.ttf'); }
+@font-face { font-family: InstrumentSans_Semi; src: url('/assets/Fonts/InstrumentSans/InstrumentSans-SemiBold.ttf'); }
+@font-face { font-family: InstrumentSans;      src: url('/assets/Fonts/InstrumentSans/InstrumentSans-Regular.ttf'); }
+
+:host {
+  --color-primary: #6F4E37;
+  --color-secondary: #FFF6EC;
+  --color-gold-star: #E2B02B;
+  --color-card-bg: #FFFFFF;
+  --color-text-dark: #333333;
+  --color-text-muted: #777777;
+  --color-border-gray: #E2E2E2;
+}
+
+* { box-sizing: border-box; }
+
+ion-content {
+  --background: var(--color-secondary);
+  font-family: InstrumentSans, system-ui, sans-serif;
+  color: var(--color-text-dark);
+}
+
+.page-header {
+  padding: 40px 20px 20px; max-width: 1100px; margin: 0 auto;
+  h1 { font-family: Merriweather_Semi, serif; font-size: 32px; color: #2D2D2D; margin: 0; }
+}
+
+.reviews-container { max-width: 1100px; margin: 0 auto 60px; padding: 0 20px; }
+
+/* Hero */
+.product-overview-card {
+  background: var(--color-card-bg); border-radius: 16px; padding: 30px;
+  display: flex; gap: 35px; align-items: center; margin-bottom: 25px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .05);
+}
+.product-image-container { flex-shrink: 0; }
+.product-image { width: 240px; height: 240px; object-fit: cover; border-radius: 12px; }
+.product-details {
+  flex: 1;
+  h2 { font-family: Merriweather_Semi, serif; font-size: 24px; margin: 0 0 10px; color: #2D2D2D; }
+}
+.origin-text { font-size: 14px; color: #666; margin-bottom: 12px; }
+.description-text { font-size: 14px; color: #555; line-height: 1.5; margin-bottom: 16px; max-width: 600px; }
+.hero-stars { color: var(--color-gold-star); font-size: 20px; margin-bottom: 8px; display: flex; gap: 4px; }
+.score-text { font-family: InstrumentSans_Semi, sans-serif; font-size: 18px; color: #2D2D2D; }
+.review-count { font-size: 12px; color: var(--color-text-muted); margin-bottom: 18px; }
+
+.leave-review-btn {
+  background: var(--color-primary); color: #fff; border: none; padding: 10px 24px;
+  border-radius: 8px; font-family: InstrumentSans_Semi, sans-serif; font-size: 14px;
+  cursor: pointer; transition: background-color .2s;
+  &:hover { background: #563C2A; }
+}
+
+/* Carousel controls */
+.carousel-controls { display: flex; gap: 10px; margin-bottom: 20px; }
+.control-btn {
+  width: 32px; height: 32px; border-radius: 50%; border: 1px solid #CCC; background: #FFF;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-family: InstrumentSans_Semi, sans-serif; font-size: 14px; color: #555; transition: all .2s;
+  &:hover { background: var(--color-primary); color: #FFF; border-color: var(--color-primary); }
+}
+
+/* Grid + cards */
+.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.no-reviews {
+  grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;
+  font-family: InstrumentSans, sans-serif;
+}
+.review-card {
+  background: var(--color-card-bg); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .05); display: flex; flex-direction: column;
+}
+.review-card-img { width: 100%; height: 180px; object-fit: cover; }
+.review-card-body { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+.reviewer-name { font-size: 13px; color: #333; margin: 0; }
+.review-rating {
+  font-size: 12px; color: #444; margin: 0;
+  .stars { color: var(--color-gold-star); font-size: 13px; }
+  .rating-num { color: var(--color-gold-star); font-weight: 600; }
+}
+.review-title { font-family: InstrumentSans_Semi, sans-serif; font-size: 14px; color: #2D2D2D; margin: 4px 0 0; }
+.review-comment { font-size: 12px; color: #555; line-height: 1.4; margin: 0; }
+.review-date { font-size: 11px; color: #999; margin-top: 6px; }
+
+/* Modal (ion-modal as a centered auto-height dialog) */
+ion-modal.review-modal {
+  --width: 440px;
+  --max-width: 92%;
+  --height: fit-content;
+  --border-radius: 12px;
+  --box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
+  --backdrop-opacity: .5;
+}
+.modal-box { background: #FFF; padding: 24px; width: 100%; font-family: InstrumentSans, sans-serif; }
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;
+  h3 { font-family: Merriweather_Semi, serif; font-size: 18px; margin: 0; }
+}
+.close-modal { background: none; border: none; font-size: 20px; cursor: pointer; }
+
+.form-field-group {
+  display: flex; flex-direction: column; margin-bottom: 16px;
+  label { font-family: InstrumentSans_Semi, sans-serif; font-size: 12px; color: #555; margin-bottom: 6px; }
+}
+.radius-10-input, .custom-input-box {
+  width: 100%; background: #F5F5F5; border: 1px solid var(--color-border-gray);
+  border-radius: 8px; padding: 10px 14px; font-family: InstrumentSans, sans-serif; font-size: 13px;
+  outline: none; box-shadow: 0 3px 6px rgba(0, 0, 0, .05); transition: all .2s;
+  &:focus { background: #FFF; border-color: var(--color-primary); box-shadow: 0 4px 10px rgba(0, 0, 0, .1); }
+}
+.custom-input-box { resize: vertical; }
+
+.submit-btn {
+  width: 100%; background: var(--color-primary); color: #FFF; border: none; padding: 12px;
+  border-radius: 8px; margin-top: 10px;
+  font-family: InstrumentSans_Semi, sans-serif; font-size: 14px; cursor: pointer; transition: background-color .2s;
+  &:hover:not(:disabled) { background: #563C2A; }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+
+.star-rating-select {
+  display: flex; gap: 6px; font-size: 24px; cursor: pointer; user-select: none;
+  .star { color: #CCC; transition: color .15s ease; &.on { color: var(--color-gold-star); } }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+  .product-overview-card { flex-direction: column; align-items: flex-start; }
+  .product-image { width: 100%; height: 200px; }
+}
+@media (max-width: 600px) {
+  .reviews-grid { grid-template-columns: 1fr; }
+}

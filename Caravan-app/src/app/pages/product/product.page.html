@@ -1,13 +1,88 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>product</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <button class="back-button" type="button" (click)="goBack()">&#x21A9;</button>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">product</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @if (loading) {
+    <div class="loading-content">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading product...</p>
+    </div>
+  } @else if (error) {
+    <p class="load-error">{{ error }}</p>
+  } @else if (item) {
+    <main class="main-contents">
+      <div class="product-container">
+        <div class="product-image-container">
+          <img class="product-image" [src]="item.product_image" [alt]="item.product_name" />
+        </div>
+
+        <div class="product-info">
+          <h1 class="product-title">{{ item.product_name }}</h1>
+          <p class="product-origin">Origin: {{ item.product_country || 'Unknown' }}</p>
+          <p class="product-description">
+            Description: {{ item.product_desc || 'No description available.' }}
+          </p>
+
+          <div class="size-selector">
+            <label for="spiceSize">Size: </label>
+            <select id="spiceSize" [(ngModel)]="size">
+              <option value="8oz">8 oz</option>
+              <option value="16oz">16 oz</option>
+            </select>
+          </div>
+
+          <div class="product-price">Price: ₱{{ price }}</div>
+
+          <button class="review-btn" type="button" (click)="goToReviews()">★ Leave a Review</button>
+
+          <button class="wishlist-btn" type="button" [disabled]="wishlistBusy" (click)="addToWishlist()">
+            {{ wishlistBusy ? 'Adding...' : '✦ Add to Wishlist' }}
+          </button>
+
+          <div class="product-actions">
+            <button class="btn-like" type="button" (click)="toggleLike()">
+              <span class="heart-icon">{{ liked ? '♥' : '♡' }}</span>
+              <span>{{ likeCount }}</span>
+            </button>
+            <button class="add-to-cart-button" type="button" aria-label="Add to Cart" (click)="addToCart()">
+              🛒
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <section class="recommendations-section">
+        <h2>Similar Herbs &amp; Spices</h2>
+        <div class="scroller">
+          <div class="product-grid">
+            @for (p of similar; track p.product_id) {
+              <div class="recommendation-card" (click)="openItem(p)">
+                <div class="cardImg"><img [src]="p.product_image" [alt]="p.product_name" /></div>
+                <div class="card-details">
+                  <h4 class="card-title">{{ p.product_name }}</h4>
+                  <p class="art-price">₱{{ (+p.product_price || 0).toFixed(2) }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="recommendations-section">
+        <h2>Herbs &amp; Spices you might like</h2>
+        <div class="scroller">
+          <div class="product-grid">
+            @for (p of random; track p.product_id) {
+              <div class="recommendation-card" (click)="openItem(p)">
+                <div class="cardImg"><img [src]="p.product_image" [alt]="p.product_name" /></div>
+                <div class="card-details">
+                  <h4 class="card-title">{{ p.product_name }}</h4>
+                  <p class="art-price">₱{{ (+p.product_price || 0).toFixed(2) }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    </main>
+  }
 </ion-content>

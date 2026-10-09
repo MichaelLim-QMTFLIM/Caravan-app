@@ -1,13 +1,102 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Review</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <header class="page-header">
+    <h1>Customer Reviews &amp; Ratings</h1>
+  </header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Review</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="reviews-container">
+    <!-- Hero Product Overview Card -->
+    <section class="product-overview-card">
+      <div class="product-image-container">
+        <img src="assets/Images/paprika.jpg" alt="Paprika Spice" class="product-image" />
+      </div>
+      <div class="product-details">
+        <h2>Product Overview</h2>
+        <p class="origin-text"><strong>Paprika</strong> - Origin: Central and South America</p>
+        <p class="description-text">
+          A vibrant spice known for its rich color and deep, smoky flavor. Perfect for enhancing soups, stews, and roasted dishes.
+        </p>
+        <div class="hero-stars" aria-hidden="true">
+          @for (s of starValues; track s) { <span>★</span> }
+        </div>
+        <div class="score-text">4.8 Out of 5 Stars</div>
+        <div class="review-count">based on 32 reviews</div>
+        <button class="leave-review-btn" type="button" (click)="openModal()">Leave a Review</button>
+      </div>
+    </section>
+
+    <!-- Carousel Controls -->
+    <div class="carousel-controls">
+      <button class="control-btn" type="button" aria-label="Previous Page"
+              [style.opacity]="canGoPrev ? 1 : 0.5" (click)="prev()">&lt;</button>
+      <button class="control-btn" type="button" aria-label="Next Page"
+              [style.opacity]="canGoNext ? 1 : 0.5" (click)="next()">&gt;</button>
+    </div>
+
+    <!-- Reviews Grid -->
+    <section class="reviews-grid">
+      @if (reviews.length === 0) {
+        <div class="no-reviews">No reviews yet. Be the first to leave a review!</div>
+      }
+
+      @for (r of pagedReviews; track $index) {
+        <article class="review-card">
+          <img src="assets/Images/paprika.jpg" alt="Paprika" class="review-card-img" />
+          <div class="review-card-body">
+            <p class="reviewer-name">User: {{ r.name }}</p>
+            <div class="review-rating">
+              Rating: <span class="stars">{{ starString(r.rating) }}</span>
+              <span class="rating-num">[{{ r.rating }} stars]</span>
+            </div>
+            <h3 class="review-title">Title: {{ r.title }}</h3>
+            <p class="review-comment">Comment: {{ r.comment }}</p>
+            <p class="review-date">Date: {{ r.date }}</p>
+          </div>
+        </article>
+      }
+    </section>
+  </main>
+
+  <!-- Review Modal -->
+  <ion-modal class="review-modal" [isOpen]="modalOpen" (didDismiss)="closeModal()">
+    <ng-template>
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Leave a Review</h3>
+          <button class="close-modal" type="button" aria-label="Close" (click)="closeModal()">&times;</button>
+        </div>
+
+        <form #reviewForm="ngForm" (ngSubmit)="submit(reviewForm)">
+          <div class="form-field-group">
+            <label for="reviewerName">Your Name</label>
+            <input id="reviewerName" name="name" type="text" class="radius-10-input"
+                   placeholder="e.g. SpiceLover" [(ngModel)]="form.name" required />
+          </div>
+
+          <div class="form-field-group">
+            <label>Rating</label>
+            <div class="star-rating-select" (mouseleave)="hoverRating = 0">
+              @for (s of starValues; track s) {
+                <span class="star" [class.on]="s <= shownRating"
+                      (mouseenter)="hoverRating = s" (click)="rating = s">★</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-field-group">
+            <label for="reviewTitle">Review Title</label>
+            <input id="reviewTitle" name="title" type="text" class="radius-10-input"
+                   placeholder="e.g. Amazing quality!" [(ngModel)]="form.title" required />
+          </div>
+
+          <div class="form-field-group">
+            <label for="reviewComment">Comment</label>
+            <textarea id="reviewComment" name="comment" class="custom-input-box" rows="4"
+                      placeholder="Share your experience..." [(ngModel)]="form.comment" required></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="reviewForm.invalid">Submit Review</button>
+        </form>
+      </div>
+    </ng-template>
+  </ion-modal>
 </ion-content>
