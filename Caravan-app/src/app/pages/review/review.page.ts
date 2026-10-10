@@ -1,22 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-
-import {
-  IonButton,
-  IonCard,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCol,
-  IonContent,
-  IonGrid,
-  IonImg,
-  IonLabel,
-  IonRow,
-  IonHeader
-} from '@ionic/angular';
+import { IonContent, IonModal } from '@ionic/angular';
 
 interface Review {
   name: string;
@@ -30,24 +15,13 @@ interface Review {
   selector: 'app-reviews',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    IonicModule,
-    IonButton,
-    IonCard,
-    IonCardHeader,
-    IonCardSubtitle,
-    IonCardTitle,
-    IonCol,
+    CommonModule,
+    FormsModule,
     IonContent,
-    IonGrid,
-    IonImg,
-    IonLabel,
-    IonRow,
-    IonHeader
+    IonModal,
   ],
-  templateUrl: './reviews.page.html',
-  styleUrls: ['./reviews.page.scss'],
+  templateUrl: './review.page.html',
+  styleUrls: ['./review.page.scss'],
 })
 
 export class ReviewsPage {

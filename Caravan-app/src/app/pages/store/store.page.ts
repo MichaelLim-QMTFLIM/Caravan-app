@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { IonContent, IonSpinner } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 
 interface ProductCategory { category_name: string; }
@@ -41,7 +41,7 @@ export class FadeInDirective implements OnInit, OnDestroy {
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, FadeInDirective],
+  imports: [CommonModule, FormsModule, IonContent, IonSpinner, FadeInDirective],
   templateUrl: './store.page.html',
   styleUrls: ['./store.page.scss'],
 })

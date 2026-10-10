@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { AlertController, IonContent, IonSpinner } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 
 interface Category { category_id: number; }
@@ -31,7 +31,7 @@ interface CartItem {
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonContent, IonSpinner],
   templateUrl: './product.page.html',
   styleUrls: ['./product.page.scss'],
 })
@@ -137,7 +137,7 @@ export class ProductPage implements OnInit {
 
   goToReviews() {
     const queryParams = this.isBundle ? { bundleId: this.itemId } : { productId: this.itemId };
-    this.router.navigate(['/user/reviews'], { queryParams: this.itemId ? queryParams : {} });
+    this.router.navigate(['/review'], { queryParams: this.itemId ? queryParams : {} });
   }
 
   // ---------- Likes ----------
