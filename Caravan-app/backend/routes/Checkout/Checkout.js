@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../imports/database");
 const { checkAuth } = require("../../imports/token");
+const { sendOrderConfirmation } = require("../../imports/email");
+const { captureOrder } = require("../paypal/paypal");
 
 router.customPath = "/checkout";
 
@@ -21,6 +23,8 @@ router.post("/", checkAuth("user"), async (req, res) => {
             items,
             addressId,
             methodId,
+            paymentType,
+            paypalOrderId,
             shippingId,
             voucherId
         } = req.body;
@@ -31,6 +35,27 @@ router.post("/", checkAuth("user"), async (req, res) => {
                 error: "User ID not found"
             });
         }
+
+        const customerResult = await db.execute({
+            sql: `
+                SELECT
+                    Cus_email,
+                    first_name
+                FROM Customer
+                WHERE Customer_id = ?
+            `,
+            args: [customerId]
+        });
+
+        if (customerResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: "Customer account was not found"
+            });
+        }
+
+        const customerEmail = customerResult.rows[0].Cus_email;
+        const customerName = customerResult.rows[0].first_name;
 
         if (!Array.isArray(items) || items.length === 0) {
             return res.status(400).json({
@@ -46,13 +71,6 @@ router.post("/", checkAuth("user"), async (req, res) => {
             });
         }
 
-        if (!methodId) {
-            return res.status(400).json({
-                success: false,
-                error: "Payment method is required"
-            });
-        }
-
         if (!shippingId) {
             return res.status(400).json({
                 success: false,
@@ -60,21 +78,35 @@ router.post("/", checkAuth("user"), async (req, res) => {
             });
         }
 
-        /*
-         * Method_id:
-         * 1 = Card
-         * 2 = Cash
-         *
-         * Card is not implemented yet.
-         */
-        if (Number(methodId) === 1) {
+        const normalizedPaymentType = String(paymentType || "cash").toLowerCase();
+        let resolvedMethodId;
+        if (normalizedPaymentType === "paypal") {
+            const paypalMethod = await db.execute({
+                sql: `
+                    SELECT Method_id
+                    FROM Payment_method
+                    WHERE LOWER(Payment_method) = 'paypal'
+                    LIMIT 1
+                `
+            });
+            if (paypalMethod.rows.length === 0) {
+                return res.status(409).json({
+                    success: false,
+                    error: "PayPal is not configured as a payment method. Add PayPal to the Payment_method table."
+                });
+            }
+            resolvedMethodId = Number(paypalMethod.rows[0].Method_id);
+            if (!paypalOrderId) {
+                return res.status(400).json({ success: false, error: "PayPal approval is required" });
+            }
+        } else if (normalizedPaymentType === "cash" && Number(methodId) === 2) {
+            resolvedMethodId = 2;
+        } else if (normalizedPaymentType === "card" || Number(methodId) === 1) {
             return res.status(501).json({
                 success: false,
                 error: "Card payment is not available yet"
             });
-        }
-
-        if (Number(methodId) !== 2) {
+        } else {
             return res.status(400).json({
                 success: false,
                 error: "Invalid payment method"
@@ -173,6 +205,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
             productCost += unitPrice * quantity;
             preparedItems.push({
                 productId,
+                productName: product.Prod_name,
                 quantity,
                 productSize,
                 unitPrice
@@ -236,6 +269,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
         }
 
         const validatedShippingId = Number(shippingResult.rows[0].Shipping_id);
+        const shippingName = shippingResult.rows[0].Shipping_name;
         const shippingFee = Number(shippingResult.rows[0].Cost);
         const totalCost = productCost + shippingFee - discount;
 
@@ -244,7 +278,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
             const preview = {
                 customerId,
                 addressId: Number(addressId),
-                methodId: Number(methodId),
+                methodId: resolvedMethodId,
                 voucherId: validatedVoucherId,
 
                 pricing: {
@@ -277,6 +311,21 @@ router.post("/", checkAuth("user"), async (req, res) => {
             });
         }
 
+        // PayPal is captured only after server-side cart, stock, address,
+        // voucher, and shipping validation has produced the final amount.
+        if (normalizedPaymentType === "paypal") {
+            try {
+                await captureOrder(
+                    paypalOrderId,
+                    customerId,
+                    Number(totalCost.toFixed(2))
+                );
+            } catch (paymentError) {
+                console.error("PayPal capture error:", paymentError.response?.data || paymentError.message);
+                throw new Error(paymentError.message || "PayPal payment could not be captured");
+            }
+        }
+
         // Create order with Confirmed status.
         const orderResult =
             await transaction.execute({
@@ -303,7 +352,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
                     Number(totalCost.toFixed(2)),
                     shippingFee,
                     Number(addressId),
-                    Number(methodId),
+                    resolvedMethodId,
                     validatedVoucherId,
                     Number(discount.toFixed(2)), 
                     validatedShippingId
@@ -390,10 +439,38 @@ router.post("/", checkAuth("user"), async (req, res) => {
         await transaction.commit();
         transaction = null;
 
+        let confirmationEmailSent = false;
+
+        try {
+            await sendOrderConfirmation({
+                customerEmail,
+                customerName,
+                orderId,
+                items: preparedItems,
+                productCost: Number(productCost.toFixed(2)),
+                discount: Number(discount.toFixed(2)),
+                shippingName,
+                shippingFee: Number(shippingFee.toFixed(2)),
+                totalCost: Number(totalCost.toFixed(2))
+            });
+
+            confirmationEmailSent = true;
+
+        } catch (emailError) {
+            console.error(
+                "Order saved, but confirmation email failed:",
+                emailError
+            );
+        }
+
         return res.status(201).json({
             success: true,
-            message: "Order placed successfully",
+            message: confirmationEmailSent
+                ? "Order placed successfully. A confirmation email was sent."
+                : "Order placed successfully, but the confirmation email could not be sent.",
+
             orderId,
+            emailSent: confirmationEmailSent,
             shippingId: validatedShippingId,
             shippingFee: Number(shippingFee.toFixed(2)),
             productCost: Number(productCost.toFixed(2)),

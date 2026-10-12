@@ -11,4 +11,6 @@ This is the Express/libSQL API from the `caravanBackend` repository. The Angular
 
 The API listens on `http://localhost:3000`; Angular proxies `/api` requests to it. The `/healthz` endpoint reports whether the API process is running. Database-backed API calls require valid Turso credentials.
 
+PayPal checkout also requires a PayPal payment method in the `Payment_method` table and `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, and `PAYPAL_API` in `.env`. Order confirmation email is optional and uses `EMAIL_USER` and `EMAIL_APP_PASSWORD`.
+
 For deployment, configure these environment variables in the server environment and route the deployed app's `/api` requests to this backend. The local Angular proxy is only for development.
