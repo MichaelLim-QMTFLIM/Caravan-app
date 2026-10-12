@@ -1,3 +1,75 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-menu
+    menuId="primary-navigation"
+    contentId="main-content"
+    side="start"
+    type="overlay"
+    class="app-sidebar"
+  >
+    <div class="sidebar-brand">
+      <a routerLink="/home" aria-label="Caravan home">
+        <img src="assets/Images/CaravanLogo_Transparent.png" alt="Caravan" />
+      </a>
+      <p>Herbs, spices &amp; more</p>
+    </div>
+
+    <ion-content>
+      <p class="sidebar-section-label">EXPLORE</p>
+      <ion-list lines="none">
+        @for (item of navigationItems; track item.path) {
+          <ion-menu-toggle>
+            <ion-item
+              [routerLink]="item.path"
+              routerDirection="root"
+              routerLinkActive="is-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              button
+            >
+              <ion-icon [name]="item.icon" slot="start" aria-hidden="true"></ion-icon>
+              <ion-label>{{ item.label }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        }
+      </ion-list>
+
+      <div class="sidebar-account-links">
+        <p class="sidebar-section-label">YOUR ACCOUNT</p>
+        <ion-menu-toggle>
+          <ion-item routerLink="/login" routerDirection="root" button>
+            <ion-icon name="log-in-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-label>Log in</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle>
+          <ion-item routerLink="/register" routerDirection="root" button>
+            <ion-icon name="person-add-outline" slot="start" aria-hidden="true"></ion-icon>
+            <ion-label>Create account</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </div>
+    </ion-content>
+  </ion-menu>
+
+  <div class="ion-page app-shell" id="main-content">
+    <ion-header class="app-header">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-button menu="primary-navigation" aria-label="Open navigation"></ion-menu-button>
+        </ion-buttons>
+
+        <a class="toolbar-brand" routerLink="/home" aria-label="Caravan home">
+          <img src="assets/Images/CaravanLogo_Transparent.png" alt="" />
+          <span>Caravan</span>
+        </a>
+
+        <ion-buttons slot="end">
+          <ion-button routerLink="/profile" aria-label="Open profile">
+            <ion-icon name="person-circle-outline" slot="icon-only" aria-hidden="true"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-router-outlet></ion-router-outlet>
+  </div>
 </ion-app>

@@ -1,0 +1,121 @@
+:host {
+  --caravan-brown: #6f4e37;
+  --caravan-cream: #faf4ed;
+  --caravan-ink: #34271f;
+}
+
+.app-sidebar {
+  --width: min(310px, 86vw);
+  --background: var(--caravan-cream);
+  --ion-background-color: var(--caravan-cream);
+}
+
+.sidebar-brand {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgb(111 78 55 / 14%);
+}
+
+.sidebar-brand a,
+.toolbar-brand {
+  display: inline-flex;
+  align-items: center;
+  color: var(--caravan-brown);
+  text-decoration: none;
+}
+
+.sidebar-brand img {
+  display: block;
+  width: min(190px, 70vw);
+  max-height: 82px;
+  object-fit: contain;
+}
+
+.sidebar-brand p {
+  margin: 0;
+  color: #806b5c;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+}
+
+.sidebar-section-label {
+  margin: 22px 20px 8px;
+  color: #8a786a;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.app-sidebar ion-list {
+  padding: 0 12px;
+  background: transparent;
+}
+
+.app-sidebar ion-menu-toggle {
+  display: block;
+}
+
+.app-sidebar ion-item {
+  --background: transparent;
+  --background-hover: rgb(111 78 55 / 8%);
+  --border-radius: 10px;
+  --color: var(--caravan-ink);
+  --min-height: 48px;
+  margin: 3px 0;
+  font-size: 0.96rem;
+}
+
+.app-sidebar ion-item ion-icon {
+  color: #806b5c;
+  font-size: 1.2rem;
+}
+
+.app-sidebar ion-item.is-active {
+  --background: #6f4e37;
+  --color: #fffaf5;
+  font-weight: 600;
+}
+
+.app-sidebar ion-item.is-active ion-icon {
+  color: #fffaf5;
+}
+
+.sidebar-account-links {
+  margin-top: 18px;
+  padding-top: 1px;
+  border-top: 1px solid rgb(111 78 55 / 14%);
+}
+
+.app-header ion-toolbar {
+  --background: #fffaf5;
+  --color: var(--caravan-brown);
+  --min-height: 62px;
+  border-bottom: 1px solid rgb(111 78 55 / 12%);
+  padding-inline: 6px;
+}
+
+.app-header ion-menu-button,
+.app-header ion-button {
+  --color: var(--caravan-brown);
+}
+
+.toolbar-brand {
+  gap: 8px;
+  font-family: Merriweather_Semi, Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.toolbar-brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar ion-item {
+    transition: none;
+  }
+}
