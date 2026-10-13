@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import { IonIcon } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
 interface LoginResponse {
   error?: string;
@@ -28,7 +29,11 @@ export class LoginPage implements OnDestroy {
 
   private errorTimer?: ReturnType<typeof setTimeout>;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private auth: AuthService,
+  ) {}
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -67,7 +72,9 @@ export class LoginPage implements OnDestroy {
         return;
       }
 
-      this.router.navigateByUrl(data.role === 'admin' ? '/admin/dashboard' : '/store');
+      this.auth.isAuthenticated = true;
+      this.auth.ready = true;
+      this.router.navigateByUrl(data.role === 'admin' ? '/admin/dashboard' : '/home');
     } catch (err: any) {
       // Non-2xx responses land here; use the server's error message if it sent one
       this.showError(err?.error?.error ?? 'Something went wrong. Please try again.');

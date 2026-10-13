@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon, IonToolbar } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
 interface RegisterResponse {
   error?: string;
@@ -38,7 +39,11 @@ export class RegisterPage implements OnDestroy {
   private errorTimer?: ReturnType<typeof setTimeout>;
   private successTimer?: ReturnType<typeof setTimeout>;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private auth: AuthService,
+  ) {}
 
   // ---- Privacy modal ----
   openPrivacy(event: Event): void {
@@ -71,7 +76,7 @@ export class RegisterPage implements OnDestroy {
     clearTimeout(this.successTimer);
     this.successTimer = setTimeout(() => {
       this.successMessage = '';
-      this.router.navigateByUrl('/store');
+      this.router.navigateByUrl('/home');
     }, 2000);
   }
 
@@ -108,6 +113,8 @@ export class RegisterPage implements OnDestroy {
       }
 
       if (data.login) {
+        this.auth.isAuthenticated = true;
+        this.auth.ready = true;
         this.showSuccess(data.login);
       }
     } catch (err: any) {

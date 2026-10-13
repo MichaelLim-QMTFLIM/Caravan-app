@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from './services/auth.service';
 import {
   IonApp,
   IonButton,
@@ -46,15 +47,34 @@ interface NavigationItem {
     IonToolbar,
   ],
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
+  showSplash = true;
+  splashFading = false;
+  private splashTimer?: ReturnType<typeof setTimeout>;
+  private splashHideTimer?: ReturnType<typeof setTimeout>;
+
+  constructor(readonly auth: AuthService) {}
+
   readonly navigationItems: NavigationItem[] = [
     { label: 'Home', path: '/home', icon: 'home-outline' },
     { label: 'Market', path: '/store', icon: 'storefront-outline' },
-    { label: 'Profile', path: '/profile', icon: 'person-outline' },
     { label: 'Cart', path: '/cart', icon: 'cart-outline' },
     { label: 'Order history', path: '/orderhistory', icon: 'receipt-outline' },
-    { label: 'Reviews', path: '/review', icon: 'star-outline' },
     { label: 'FAQs', path: '/faqs', icon: 'help-circle-outline' },
     { label: 'About Caravan', path: '/about', icon: 'information-circle-outline' },
   ];
+
+  ngOnInit(): void {
+    // Startup must continue to login even when the API server is offline.
+    this.splashTimer = setTimeout(() => {
+      this.splashFading = true;
+      this.splashHideTimer = setTimeout(() => (this.showSplash = false), 300);
+    }, 900);
+    void this.auth.refresh();
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.splashTimer);
+    clearTimeout(this.splashHideTimer);
+  }
 }

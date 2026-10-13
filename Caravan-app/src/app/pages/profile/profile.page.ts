@@ -7,6 +7,8 @@ import {
 
 import { addIcons } from 'ionicons';
 import { person } from 'ionicons/icons';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 type ProfileTab =
   | 'overview'
@@ -126,7 +128,10 @@ export class ProfilePage {
     }
   ];
 
-  constructor() {
+  constructor(
+    private readonly auth: AuthService,
+    private readonly router: Router,
+  ) {
     addIcons({
       person
     });
@@ -314,13 +319,10 @@ export class ProfilePage {
     this.showLogoutModal = true;
   }
 
-  confirmLogout(): void {
+  async confirmLogout(): Promise<void> {
     this.showLogoutModal = false;
-    console.log('User logged out');
-
-    // later:
-    // localStorage.clear();
-    // this.router.navigate(['/login']);
+    await this.auth.logout();
+    this.router.navigateByUrl('/login');
   }
 
   cancelLogout(): void {

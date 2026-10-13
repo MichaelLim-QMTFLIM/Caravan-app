@@ -66,7 +66,7 @@ if (existingUser.rows.length > 0) {
     if (result.affectedRows === 0) {
       return res.status(500).json({ error: "Server error" });
     }
-    const user = await db.execute({
+    const userResult = await db.execute({
       sql: `
         SELECT *
         FROM Customer
@@ -75,6 +75,11 @@ if (existingUser.rows.length > 0) {
       `,
       args: [email, password],
     });
+
+    const user = userResult.rows[0];
+    if (!user) {
+      return res.status(500).json({ error: "Server error" });
+    }
 
     const token = jwt.sign(
       {
