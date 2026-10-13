@@ -1,11 +1,11 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import { IonIcon } from '@ionic/angular';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription, take } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 
 interface LoginResponse {
@@ -20,20 +20,30 @@ interface LoginResponse {
   standalone: true,
   imports: [IonContent, FormsModule, NgIf, RouterLink, IonIcon],
 })
-export class LoginPage implements OnDestroy {
+export class LoginPage implements OnInit, OnDestroy {
   email = '';
   password = '';
   showPassword = false;
-  loading = false;
-  errorMessage = '';
+  readonly loading = signal(false);
+  readonly errorMessage = signal('');
 
   private errorTimer?: ReturnType<typeof setTimeout>;
+  private querySubscription?: Subscription;
 
   constructor(
     private http: HttpClient,
     private router: Router,
+    private route: ActivatedRoute,
     private auth: AuthService,
   ) {}
+
+  ngOnInit(): void {
+    this.querySubscription = this.route.queryParamMap.pipe(take(1)).subscribe((params) => {
+      if (params.get('error') === 'google_auth') {
+        this.showError('Google sign-in could not be completed. Please try again.');
+      }
+    });
+  }
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -44,23 +54,23 @@ export class LoginPage implements OnDestroy {
   }
 
   private showError(message: string): void {
-    this.errorMessage = message;
+    this.errorMessage.set(message);
     clearTimeout(this.errorTimer);
-    this.errorTimer = setTimeout(() => (this.errorMessage = ''), 2000);
+    this.errorTimer = setTimeout(() => this.errorMessage.set(''), 2000);
   }
 
   async onSubmit(): Promise<void> {
     const email = this.email.trim();
     const password = this.password;
 
-    this.errorMessage = '';
+    this.errorMessage.set('');
 
     if (email === '') return this.showError('Please enter your email address.');
     if (!this.validateEmail(email)) return this.showError("That isn't a valid email address.");
     if (password === '') return this.showError('Please enter your password.');
     if (password.length < 6) return this.showError('Password must be at least 6 characters.');
 
-    this.loading = true;
+    this.loading.set(true);
 
     try {
       const data = await firstValueFrom(
@@ -72,18 +82,19 @@ export class LoginPage implements OnDestroy {
         return;
       }
 
-      this.auth.isAuthenticated = true;
-      this.auth.ready = true;
-      this.router.navigateByUrl(data.role === 'admin' ? '/admin/dashboard' : '/home');
+      this.auth.isAuthenticated.set(true);
+      this.auth.ready.set(true);
+      this.router.navigateByUrl('/home');
     } catch (err: any) {
       // Non-2xx responses land here; use the server's error message if it sent one
       this.showError(err?.error?.error ?? 'Something went wrong. Please try again.');
     } finally {
-      this.loading = false;
+      this.loading.set(false);
     }
   }
 
   ngOnDestroy(): void {
     clearTimeout(this.errorTimer);
+    this.querySubscription?.unsubscribe();
   }
 }

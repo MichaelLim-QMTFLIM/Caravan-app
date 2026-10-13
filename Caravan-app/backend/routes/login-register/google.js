@@ -11,6 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL;
+const FRONTEND_URL = (process.env.FRONTEND_URL || "http://localhost:8100").replace(/\/$/, "");
 
 const googleClient = new OAuth2Client(
   GOOGLE_CLIENT_ID,
@@ -46,7 +47,7 @@ app.get("/auth/google/callback", async (req, res) => {
     const { code } = req.query;
 
     if (!code) {
-      res.redirect("/");
+      return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
     }
 
     /*
@@ -66,9 +67,7 @@ app.get("/auth/google/callback", async (req, res) => {
     const payload = ticket.getPayload();
 
     if (!payload) {
-      return res.status(401).json({
-        error: "Invalid Google identity",
-      });
+      return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
     }
 
     const {
@@ -80,9 +79,7 @@ app.get("/auth/google/callback", async (req, res) => {
     } = payload;
 
     if (!email || !email_verified) {
-      return res.status(401).json({
-        error: "Google email is not verified",
-      });
+      return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
     }
 
     /*
@@ -125,9 +122,7 @@ app.get("/auth/google/callback", async (req, res) => {
       });
 
       if (result.affectedRows === 0) {
-        return res.status(500).json({
-          error: "Failed to create account",
-        });
+        return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
       }
 
       /*
@@ -173,13 +168,10 @@ app.get("/auth/google/callback", async (req, res) => {
     /*
      * Send the user back to your frontend.
      */
-    return res.redirect("/");
+    return res.redirect(`${FRONTEND_URL}/home`);
   } catch (err) {
     console.error("Google login error:", err);
-
-    return res.status(500).json({
-      error: "Google authentication failed",
-    });
+    return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
   }
 });
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, timeout } from 'rxjs';
 
@@ -8,8 +8,8 @@ interface SessionResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  isAuthenticated = false;
-  ready = false;
+  readonly isAuthenticated = signal(false);
+  readonly ready = signal(false);
 
   constructor(private readonly http: HttpClient) {}
 
@@ -18,13 +18,13 @@ export class AuthService {
       const session = await firstValueFrom(
         this.http.get<SessionResponse>('/api/isLoggedIn').pipe(timeout(3000)),
       );
-      this.isAuthenticated = session.loggedIn === true;
+      this.isAuthenticated.set(session.loggedIn === true);
     } catch {
-      this.isAuthenticated = false;
+      this.isAuthenticated.set(false);
     } finally {
-      this.ready = true;
+      this.ready.set(true);
     }
-    return this.isAuthenticated;
+    return this.isAuthenticated();
   }
 
   async logout(): Promise<void> {
@@ -33,8 +33,8 @@ export class AuthService {
     } catch {
       // Clear the local account state even when the API is offline.
     } finally {
-      this.isAuthenticated = false;
-      this.ready = true;
+      this.isAuthenticated.set(false);
+      this.ready.set(true);
     }
   }
 }

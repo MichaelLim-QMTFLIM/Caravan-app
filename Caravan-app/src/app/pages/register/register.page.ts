@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -32,9 +32,9 @@ export class RegisterPage implements OnDestroy {
   showPassword = false;
   showConfirmPassword = false;
 
-  loading = false;
-  errorMessage = '';
-  successMessage = '';
+  readonly loading = signal(false);
+  readonly errorMessage = signal('');
+  readonly successMessage = signal('');
 
   private errorTimer?: ReturnType<typeof setTimeout>;
   private successTimer?: ReturnType<typeof setTimeout>;
@@ -66,16 +66,16 @@ export class RegisterPage implements OnDestroy {
   }
 
   private showError(message: string): void {
-    this.errorMessage = message;
+    this.errorMessage.set(message);
     clearTimeout(this.errorTimer);
-    this.errorTimer = setTimeout(() => (this.errorMessage = ''), 2000);
+    this.errorTimer = setTimeout(() => this.errorMessage.set(''), 2000);
   }
 
   private showSuccess(message: string): void {
-    this.successMessage = message;
+    this.successMessage.set(message);
     clearTimeout(this.successTimer);
     this.successTimer = setTimeout(() => {
-      this.successMessage = '';
+      this.successMessage.set('');
       this.router.navigateByUrl('/home');
     }, 2000);
   }
@@ -87,8 +87,8 @@ export class RegisterPage implements OnDestroy {
     const email = this.email.trim();
     const password = this.password;
 
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
     if (firstName === '') return this.showError('Please enter your first name.');
     if (lastName === '') return this.showError('Please enter your last name.');
@@ -99,7 +99,7 @@ export class RegisterPage implements OnDestroy {
       return this.showError('You must agree to the Data Privacy Policy to register.');
     }
 
-    this.loading = true;
+    this.loading.set(true);
 
     try {
       const data = await firstValueFrom(
@@ -107,18 +107,18 @@ export class RegisterPage implements OnDestroy {
       );
 
       if (data.error) {
-        this.loading = false;
+        this.loading.set(false);
         this.showError(data.error);
         return;
       }
 
       if (data.login) {
-        this.auth.isAuthenticated = true;
-        this.auth.ready = true;
+        this.auth.isAuthenticated.set(true);
+        this.auth.ready.set(true);
         this.showSuccess(data.login);
       }
     } catch (err: any) {
-      this.loading = false;
+      this.loading.set(false);
       this.showError(err?.error?.error ?? 'Something went wrong. Please try again.');
     }
   }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import {
@@ -48,8 +48,8 @@ interface NavigationItem {
   ],
 })
 export class AppComponent implements OnInit, OnDestroy {
-  showSplash = true;
-  splashFading = false;
+  readonly showSplash = signal(true);
+  readonly splashFading = signal(false);
   private splashTimer?: ReturnType<typeof setTimeout>;
   private splashHideTimer?: ReturnType<typeof setTimeout>;
 
@@ -67,8 +67,8 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Startup must continue to login even when the API server is offline.
     this.splashTimer = setTimeout(() => {
-      this.splashFading = true;
-      this.splashHideTimer = setTimeout(() => (this.showSplash = false), 300);
+      this.splashFading.set(true);
+      this.splashHideTimer = setTimeout(() => this.showSplash.set(false), 300);
     }, 900);
     void this.auth.refresh();
   }

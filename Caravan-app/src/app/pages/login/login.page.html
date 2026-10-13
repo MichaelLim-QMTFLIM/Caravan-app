@@ -4,7 +4,7 @@
       <h1 class="form-title">SIGN IN</h1>
       <p class="form-subtitle">Please confirm your details</p>
 
-      <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="error-message" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
       <form class="register-form" (ngSubmit)="onSubmit()">
         <input
@@ -37,8 +37,8 @@
           </button>
         </div>
 
-        <button type="submit" class="register-btn" [disabled]="loading">
-          {{ loading ? 'LOADING...' : 'SIGN IN' }}
+        <button type="submit" class="register-btn" [disabled]="loading()">
+          {{ loading() ? 'LOADING...' : 'SIGN IN' }}
         </button>
       </form>
 

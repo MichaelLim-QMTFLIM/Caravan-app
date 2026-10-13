@@ -34,14 +34,14 @@
 
       <div class="sidebar-account-links">
         <p class="sidebar-section-label">YOUR ACCOUNT</p>
-        @if (auth.ready && auth.isAuthenticated) {
+        @if (auth.ready() && auth.isAuthenticated()) {
           <ion-menu-toggle>
             <ion-item routerLink="/profile" routerDirection="root" routerLinkActive="is-active" button>
               <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
               <ion-label>Profile</ion-label>
             </ion-item>
           </ion-menu-toggle>
-        } @else if (auth.ready) {
+        } @else if (auth.ready()) {
           <ion-menu-toggle>
             <ion-item routerLink="/login" routerDirection="root" routerLinkActive="is-active" button>
               <ion-icon name="log-in-outline" slot="start" aria-hidden="true"></ion-icon>
@@ -72,8 +72,8 @@
         </a>
 
         <ion-buttons slot="end">
-          @if (auth.ready) {
-            <ion-button [routerLink]="auth.isAuthenticated ? '/profile' : '/login'" [attr.aria-label]="auth.isAuthenticated ? 'Open profile' : 'Log in'">
+          @if (auth.ready()) {
+            <ion-button [routerLink]="auth.isAuthenticated() ? '/profile' : '/login'" [attr.aria-label]="auth.isAuthenticated() ? 'Open profile' : 'Log in'">
               <ion-icon name="person-circle-outline" slot="icon-only" aria-hidden="true"></ion-icon>
             </ion-button>
           }
@@ -84,8 +84,8 @@
     <ion-router-outlet></ion-router-outlet>
   </div>
 
-  @if (showSplash) {
-    <div class="app-splash" [class.is-leaving]="splashFading" role="status" aria-live="polite">
+  @if (showSplash()) {
+    <div class="app-splash" [class.is-leaving]="splashFading()" role="status" aria-live="polite">
       <img src="assets/Images/CaravanLogo_Transparent.png" alt="Caravan" />
       <p>Herbs, spices &amp; more</p>
       <span class="splash-loader" aria-hidden="true"></span>
