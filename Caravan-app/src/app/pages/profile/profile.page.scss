@@ -28,6 +28,35 @@ ion-content {
   overflow: hidden;
 }
 
+.page-message,
+.error-message {
+  margin: 12px 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.page-message {
+  background: #ffffff;
+  color: var(--caravan-brown);
+  text-align: center;
+}
+
+.error-message {
+  border: 1px solid #efc4c1;
+  background: #fff1f0;
+  color: #9d211c;
+}
+
+.delete-address-preview {
+  margin: 12px 0;
+  padding: 12px;
+  border-left: 4px solid var(--danger-colour);
+  border-radius: 8px;
+  background: #fff1f0;
+  overflow-wrap: anywhere;
+}
+
 .profile-header {
   padding: 30px 20px;
   background: var(--caravan-brown);

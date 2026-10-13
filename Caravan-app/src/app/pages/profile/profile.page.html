@@ -1,6 +1,14 @@
 <ion-content>
   <div class="profile-wrapper">
 
+    @if (loading) {
+      <div class="page-message">Loading your profile…</div>
+    }
+
+    @if (error) {
+      <div class="error-message" role="alert">{{ error }}</div>
+    }
+
     <div class="profile-header">
       <div class="profile-avatar">
         <ion-icon name="person"></ion-icon>
@@ -27,14 +35,6 @@
       <button
         type="button"
         class="tab-btn"
-        [class.active]="activeTab === 'payment'"
-        (click)="activeTab = 'payment'">
-        Payment
-      </button>
-
-      <button
-        type="button"
-        class="tab-btn"
         [class.active]="activeTab === 'addresses'"
         (click)="activeTab = 'addresses'">
         Addresses
@@ -54,14 +54,6 @@
         [class.active]="activeTab === 'wishlist'"
         (click)="activeTab = 'wishlist'">
         Wishlist
-      </button>
-
-      <button
-        type="button"
-        class="tab-btn"
-        [class.active]="activeTab === 'orders'"
-        (click)="activeTab = 'orders'">
-        Order History
       </button>
 
       <button
@@ -132,7 +124,7 @@
                 type="password"
                 [(ngModel)]="profile.password"
                 name="password"
-                placeholder="••••••••"
+                placeholder="Leave blank to keep current password"
                 [readonly]="!isEditingProfile">
             </div>
 
@@ -167,45 +159,6 @@
               }
             </div>
           </form>
-        </section>
-      }
-
-      <!-- PAYMENT METHODS -->
-      @if (activeTab === 'payment') {
-        <section class="content-section">
-          <h2>Payment Methods</h2>
-
-          <button
-            type="button"
-            class="add-btn"
-            (click)="openCardModal()">
-            Add a New Card
-          </button>
-
-          <div class="card-list">
-            @for (card of paymentCards; track card.id) {
-              <div class="payment-card">
-                <div>
-                  <strong>{{ card.holder }}</strong>
-                  <p>•••• •••• •••• {{ card.lastFour }}</p>
-                  <small>Expires {{ card.expiry }}</small>
-                </div>
-
-                <button
-                  type="button"
-                  class="delete-outline-btn"
-                  (click)="deleteCard(card.id)">
-                  Delete
-                </button>
-              </div>
-            }
-
-            @if (paymentCards.length === 0) {
-              <div class="empty-message">
-                No payment methods added.
-              </div>
-            }
-          </div>
         </section>
       }
 
@@ -247,7 +200,7 @@
               </div>
             }
 
-            @if (addresses.length === 0) {
+            @if (!loading && addresses.length === 0) {
               <div class="empty-message">
                 No addresses added.
               </div>
@@ -261,15 +214,22 @@
         <section class="content-section">
           <h2>My Vouchers</h2>
 
-          <div class="voucher-card">
-            <div>
-              <strong>WELCOME10</strong>
-              <p>10% discount on your next order</p>
-            </div>
-
-            <span class="voucher-status">
-              Unused
-            </span>
+          <div class="card-list">
+            @for (voucher of vouchers; track voucher.Voucher_id) {
+              <div class="voucher-card">
+                <div>
+                  <strong>{{ voucher.Voucher_name }}</strong>
+                  <p>{{ voucher.Voucher_desc }}</p>
+                  @if (voucher.discount !== null && voucher.discount !== undefined) {
+                    <small>{{ voucher.discount }}% discount</small>
+                  }
+                </div>
+                <span class="voucher-status">Unused</span>
+              </div>
+            }
+            @if (!loading && vouchers.length === 0) {
+              <div class="empty-message">You have no unused vouchers.</div>
+            }
           </div>
         </section>
       }
@@ -284,6 +244,7 @@
               <div class="wishlist-card">
                 <img
                   [src]="item.image"
+                  (error)="$any($event.target).src = 'assets/Images/ItemNotFound_nobg.png'"
                   [alt]="item.name"
                   class="wishlist-image">
 
@@ -295,7 +256,7 @@
                     <button
                       type="button"
                       class="primary-btn small-btn"
-                      (click)="viewWishlistItem(item.id)">
+                      (click)="viewWishlistItem(item)">
                       Go To
                     </button>
 
@@ -310,29 +271,11 @@
               </div>
             }
 
-            @if (wishlistItems.length === 0) {
+            @if (!loading && wishlistItems.length === 0) {
               <div class="empty-message">
                 Your wishlist is empty.
               </div>
             }
-          </div>
-        </section>
-      }
-
-      <!-- ORDER HISTORY -->
-      @if (activeTab === 'orders') {
-        <section class="content-section">
-          <h2>Order History</h2>
-
-          <div class="simple-action-box">
-            <p>View your previous orders and order details.</p>
-
-            <button
-              type="button"
-              class="primary-btn"
-              (click)="viewOrders()">
-              View Your Orders
-            </button>
           </div>
         </section>
       }
@@ -357,87 +300,6 @@
 
     </div>
   </div>
-
-  <!-- ADD CARD MODAL -->
-  @if (showCardModal) {
-    <div class="modal-overlay" (click)="closeCardModal()">
-      <div class="modal-box" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Add a New Card</h3>
-
-          <button
-            type="button"
-            class="close-btn"
-            (click)="closeCardModal()">
-            ×
-          </button>
-        </div>
-
-        <form (ngSubmit)="saveCard()">
-          <div class="form-group">
-            <label for="cardHolder">Name on Card</label>
-            <input
-              id="cardHolder"
-              type="text"
-              [(ngModel)]="newCard.holder"
-              name="cardHolder"
-              placeholder="John Doe Monroe"
-              required>
-          </div>
-
-          <div class="form-group">
-            <label for="cardNumber">Card Number</label>
-            <input
-              id="cardNumber"
-              type="text"
-              [(ngModel)]="newCard.number"
-              name="cardNumber"
-              placeholder="4532 1234 5678 8890"
-              maxlength="19"
-              required>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="expiryDate">Expiry Date</label>
-              <input
-                id="expiryDate"
-                type="text"
-                [(ngModel)]="newCard.expiry"
-                name="expiryDate"
-                placeholder="MM/YY"
-                required>
-            </div>
-
-            <div class="form-group">
-              <label for="cvv">CVV</label>
-              <input
-                id="cvv"
-                type="password"
-                [(ngModel)]="newCard.cvv"
-                name="cvv"
-                placeholder="123"
-                maxlength="4"
-                required>
-            </div>
-          </div>
-
-          <div class="modal-actions">
-            <button type="submit" class="primary-btn">
-              Save Card
-            </button>
-
-            <button
-              type="button"
-              class="secondary-btn"
-              (click)="closeCardModal()">
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  }
 
   <!-- ADD/EDIT ADDRESS MODAL -->
   @if (showAddressModal) {
@@ -493,7 +355,7 @@
           </div>
 
           <div class="modal-actions">
-            <button type="submit" class="primary-btn">
+            <button type="submit" class="primary-btn" [disabled]="busy">
               {{ editingAddressId !== null ? 'Save Changes' : 'Save Address' }}
             </button>
 
@@ -520,8 +382,9 @@
           <button
             type="button"
             class="primary-btn"
+            [disabled]="saving"
             (click)="confirmSaveProfile()">
-            Save
+            {{ saving ? 'Saving…' : 'Save' }}
           </button>
 
           <button
@@ -544,6 +407,11 @@
           Are you sure you want to delete this address?
           This action cannot be undone.
         </p>
+        @if (addressToDelete; as address) {
+          <div class="delete-address-preview">
+            {{ address.street }}, {{ address.city }}, {{ address.zipCode }}
+          </div>
+        }
 
         <div class="modal-actions">
           <button
