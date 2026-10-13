@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import {
   IonApp,
@@ -53,8 +54,14 @@ export class AppComponent implements OnInit, OnDestroy {
   private splashTimer?: ReturnType<typeof setTimeout>;
   private splashHideTimer?: ReturnType<typeof setTimeout>;
 
-  constructor(readonly auth: AuthService) {}
+  private navigationSubscription?: Subscription;
 
+  constructor(
+    readonly auth: AuthService,
+    private readonly router: Router,
+  ) {}
+
+  readonly showNavigation = signal(true);
   readonly navigationItems: NavigationItem[] = [
     { label: 'Home', path: '/home', icon: 'home-outline' },
     { label: 'Market', path: '/store', icon: 'storefront-outline' },
@@ -65,6 +72,11 @@ export class AppComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
+    this.updateNavigationVisibility(this.router.url);
+    this.navigationSubscription = this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => this.updateNavigationVisibility(event.urlAfterRedirects));
+
     // Startup must continue to login even when the API server is offline.
     this.splashTimer = setTimeout(() => {
       this.splashFading.set(true);
@@ -74,7 +86,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.navigationSubscription?.unsubscribe();
     clearTimeout(this.splashTimer);
     clearTimeout(this.splashHideTimer);
+  }
+
+  private updateNavigationVisibility(url: string): void {
+    const path = url.split(/[?#]/, 1)[0];
+    this.showNavigation.set(path !== '/login' && path !== '/register');
   }
 }
