@@ -1,5 +1,5 @@
-import { Component, Directive, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -10,121 +10,144 @@ interface ProductCategory { category_name: string; }
 
 interface StoreItem {
   product_id: number;
-  type_id: number; // 1 = product, 2 = bundle
+  type_id: number;
   product_name: string;
   product_image: string;
   product_price: number;
+  product_likes: number;
+  product_rating: number;
+  review_count: number;
   product_country?: string;
   product_category?: ProductCategory[];
-}
-
-/** Fades a card in/out as it enters/leaves the viewport (replaces the IntersectionObserver in storepage.js). */
-@Directive({ selector: '[fadeIn]', standalone: true })
-export class FadeInDirective implements OnInit, OnDestroy {
-  private observer?: IntersectionObserver;
-
-  constructor(private el: ElementRef<HTMLElement>) {}
-
-  ngOnInit() {
-    this.observer = new IntersectionObserver(
-      entries => entries.forEach(e => e.target.classList.toggle('show', e.isIntersecting)),
-      { threshold: 0.2 }
-    );
-    this.observer.observe(this.el.nativeElement);
-  }
-
-  ngOnDestroy() {
-    this.observer?.disconnect();
-  }
 }
 
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonSpinner, FadeInDirective],
+  imports: [CommonModule, FormsModule, IonContent, IonSpinner],
   templateUrl: './store.page.html',
   styleUrls: ['./store.page.scss'],
 })
 export class StorePage implements OnInit {
   currentTab: 'products' | 'bundles' = 'products';
   loading = true;
-
+  error = '';
   products: StoreItem[] = [];
   bundles: StoreItem[] = [];
-  filteredProducts: StoreItem[] = [];
-  filteredBundles: StoreItem[] = [];
   countries: string[] = [];
 
-  // Filters
   searchInput = '';
-  private appliedSearch = '';
   selectedCountry = '';
-  selectedCategory = ''; // '' = All Categories
-
-  categoryGroups = [
-    { name: 'Cooking', subs: ['Appetizers / Starters', 'Main Course', 'Soups & Stews', 'Side Dishes', 'Sauce & Condiments'] },
-    { name: 'Medicine', subs: ['First aid', 'Herbal Remedies & Supplements', 'Health & Wellness'] },
-    { name: 'Garnishing', subs: ['Herbs & leaves', 'Edible Flowers', 'Decorative Plating'] },
-    { name: 'Drinks', subs: ['Hot Beverages', 'Cold Beverages', 'Juice & Smoothies'] },
-    { name: 'Baking', subs: ['Cakes', 'Breads', 'Pastries', 'Desserts'] },
-  ];
+  selectedCategory = '';
+  minimumPrice: number | null = null;
+  maximumPrice: number | null = null;
+  currentPage = 1;
+  readonly pageSize = 30;
 
   constructor(
-    private http: HttpClient,
-    private router: Router,
+    private readonly http: HttpClient,
+    private readonly router: Router,
+    private readonly changeDetector: ChangeDetectorRef,
   ) {}
 
-  async ngOnInit() {
+  ngOnInit(): void { void this.loadItems(); }
+
+  get availableCategories(): string[] {
+    const items = [...this.products, ...this.bundles];
+    return [...new Set(items.flatMap(item => (item.product_category ?? [])
+      .map(category => category.category_name?.trim())
+      .filter((name): name is string => !!name)))].sort((a, b) => a.localeCompare(b));
+  }
+
+  get filteredItems(): StoreItem[] {
+    const search = this.searchInput.trim().toLocaleLowerCase();
+    return this.activeItems
+      .filter(item => !search || item.product_name.toLocaleLowerCase().includes(search))
+      .filter(item => !this.selectedCountry || item.product_country === this.selectedCountry)
+      .filter(item => !this.selectedCategory || (item.product_category ?? [])
+        .some(category => category.category_name === this.selectedCategory))
+      .filter(item => this.minimumPrice === null || item.product_price >= this.minimumPrice)
+      .filter(item => this.maximumPrice === null || item.product_price <= this.maximumPrice)
+      .sort((a, b) => a.product_name.localeCompare(b.product_name));
+  }
+
+  get visibleItems(): StoreItem[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredItems.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredItems.length / this.pageSize));
+  }
+
+  get activeItems(): StoreItem[] {
+    return this.currentTab === 'products' ? this.products : this.bundles;
+  }
+
+  async loadItems(): Promise<void> {
+    this.loading = true;
+    this.error = '';
     try {
       const data = await firstValueFrom(this.http.get<StoreItem[]>('/api/fetchProducts'));
-      this.products = data.filter(i => Number(i.type_id) === 1);
-      this.bundles = data.filter(i => Number(i.type_id) === 2);
-      this.countries = [
-        ...new Set(this.products.map(p => p.product_country).filter((c): c is string => !!c)),
-      ].sort();
-      this.applyFilters();
-    } catch (e) {
-      console.error('Error loading items:', e);
+      this.products = data.filter(item => Number(item.type_id) === 1);
+      this.bundles = data.filter(item => Number(item.type_id) === 2);
+      this.countries = [...new Set(data.map(item => item.product_country?.trim())
+        .filter((country): country is string => !!country))].sort((a, b) => a.localeCompare(b));
+      this.clampPage();
+    } catch (error) {
+      console.error('Unable to load store items:', error);
+      this.error = 'Unable to load products right now. Please try again.';
     } finally {
       this.loading = false;
+      this.changeDetector.detectChanges();
     }
   }
 
-  // ---------- Tabs / search / filters ----------
-
-  switchTab(tab: 'products' | 'bundles') {
+  switchTab(tab: 'products' | 'bundles'): void {
     this.currentTab = tab;
-    this.applyFilters();
+    this.selectedCategory = '';
+    this.currentPage = 1;
   }
 
-  search() {
-    this.applyFilters();
+  filtersChanged(): void {
+    this.currentPage = 1;
   }
 
-  applyFilters() {
-    this.appliedSearch = this.searchInput.trim().toLowerCase();
-    const byName = (a: StoreItem, b: StoreItem) => a.product_name.localeCompare(b.product_name);
-
-    this.filteredProducts = this.products
-      .filter(p => {
-        const matchesCategory =
-          !this.selectedCategory ||
-          (p.product_category ?? []).some(c => c.category_name === this.selectedCategory);
-        const matchesCountry = !this.selectedCountry || p.product_country === this.selectedCountry;
-        const matchesSearch = p.product_name.toLowerCase().includes(this.appliedSearch);
-        return matchesCategory && matchesCountry && matchesSearch;
-      })
-      .sort(byName);
-
-    this.filteredBundles = this.bundles
-      .filter(b => b.product_name.toLowerCase().includes(this.appliedSearch))
-      .sort(byName);
+  selectCategory(category: string): void {
+    this.selectedCategory = category;
+    this.currentPage = 1;
   }
 
-  // ---------- Navigation ----------
+  goToPage(value: unknown): void {
+    const page = Number(value);
+    if (!Number.isFinite(page)) return;
+    this.currentPage = Math.max(1, Math.min(this.totalPages, Math.trunc(page)));
+  }
 
-  openItem(item: StoreItem) {
-    const key = Number(item.type_id) === 2 ? 'bundleId' : 'productId';
-    this.router.navigate(['/product'], { queryParams: { [key]: item.product_id } });
+  previousPage(): void { this.goToPage(this.currentPage - 1); }
+  nextPage(): void { this.goToPage(this.currentPage + 1); }
+
+  openItem(item: StoreItem): void {
+    const param = Number(item.type_id) === 2 ? 'bundleId' : 'productId';
+    void this.router.navigate(['/product'], { queryParams: { [param]: item.product_id } });
+  }
+
+  starString(item: StoreItem): string {
+    const filled = Math.max(0, Math.min(5, Math.round(Number(item.product_rating) || 0)));
+    return '★'.repeat(filled) + '☆'.repeat(5 - filled);
+  }
+
+  ratingLabel(item: StoreItem): string {
+    const count = Number(item.review_count) || 0;
+    return count ? `${Number(item.product_rating).toFixed(1)} (${count})` : 'No ratings';
+  }
+
+  imageFailed(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.src = 'assets/Images/ItemNotFound_nobg.png';
+  }
+
+  private clampPage(): void {
+    this.currentPage = Math.min(Math.max(1, this.currentPage), this.totalPages);
   }
 }
