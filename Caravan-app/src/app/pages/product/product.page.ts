@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, IonContent, IonSpinner } from '@ionic/angular';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout } from 'rxjs';
 
 interface Category { category_id: number; }
 
@@ -41,114 +41,114 @@ export class ProductPage implements OnInit {
   item?: Product;
   loading = true;
   error = '';
-
   size: '8oz' | '16oz' = '8oz';
   liked = false;
   likeCount = 0;
   wishlistBusy = false;
-
   similar: Product[] = [];
   random: Product[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location,
     private http: HttpClient,
     private alerts: AlertController,
+    private changeDetector: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
-    // Re-runs when navigating product -> product (same component instance)
     this.route.queryParamMap.subscribe(params => {
-      const bundleId = Number(params.get('bundleId'));
-      const productId = Number(params.get('productId'));
-      this.isBundle = !!bundleId;
+      const bundleId = Number(params.get('bundleId')) || 0;
+      const productId = Number(params.get('productId')) || 0;
+      this.isBundle = bundleId > 0;
       this.itemId = bundleId || productId;
-      this.load();
+      this.size = '8oz';
+      void this.load();
     });
   }
 
   get price(): string {
-    const multiplier = this.size === '8oz' ? 8 : 16;
-    return ((Number(this.item?.product_price) || 0) * multiplier).toFixed(2);
+    const ounces = this.size === '8oz' ? 8 : 16;
+    return ((Number(this.item?.product_price) || 0) * ounces).toFixed(2);
   }
-
-  // ---------- Loading ----------
 
   private async load() {
     this.loading = true;
     this.error = '';
+    this.item = undefined;
     this.liked = false;
-    try {
-      const [itemData, all] = await Promise.all([
-        firstValueFrom(
-          this.http.get<Product | Product[]>('/api/fetchProducts', { params: { productId: this.itemId } })
-        ),
-        firstValueFrom(this.http.get<Product[]>('/api/fetchProducts')),
-      ]);
+    this.changeDetector.detectChanges();
 
-      const item = Array.isArray(itemData) ? itemData[0] : itemData;
-      if (!item) throw new Error('not found');
-      if (this.isBundle && Number(item.type_id) !== 2) throw new Error('not a bundle');
+    if (!Number.isInteger(this.itemId) || this.itemId <= 0) {
+      this.error = `Unable to identify this ${this.isBundle ? 'bundle' : 'product'}.`;
+      this.loading = false;
+      this.changeDetector.detectChanges();
+      return;
+    }
+
+    try {
+      // Use the same catalog request as the Market page, then derive the selected,
+      // related, and random items from that single response.
+      const response = await firstValueFrom(
+        this.http.get<Product[]>('/api/fetchProducts').pipe(timeout({ first: 15000 }))
+      );
+      const all = Array.isArray(response) ? response : [];
+      const item = all.find(product => Number(product.product_id) === this.itemId);
+      if (!item) throw new Error('Item not found');
+      if ((Number(item.type_id) === 2) !== this.isBundle) throw new Error('Item type does not match route');
 
       this.item = item;
       this.likeCount = Number(item.product_likes) || 0;
       this.similar = this.shuffle(this.getSimilar(item, all)).slice(0, 7);
-      this.random = this.shuffle(all.filter(p => +p.product_id !== +item.product_id)).slice(0, 7);
+      this.random = this.shuffle(all.filter(p => Number(p.product_id) !== Number(item.product_id))).slice(0, 7);
     } catch (e) {
       console.error('Error loading item:', e);
       this.error = `Unable to load this ${this.isBundle ? 'bundle' : 'product'}.`;
     } finally {
       this.loading = false;
+      this.changeDetector.detectChanges();
     }
   }
 
   private getSimilar(item: Product, all: Product[]): Product[] {
     const mine = item.product_category ?? [];
-    return all.filter(o => {
-      if (+o.product_id === +item.product_id) return false;
-      const sameCountry = o.product_country === item.product_country;
-      const sameCategory = (o.product_category ?? []).some(oc =>
-        mine.some(c => +c.category_id === +oc.category_id));
+    return all.filter(other => {
+      if (Number(other.product_id) === Number(item.product_id)) return false;
+      const sameCountry = !!item.product_country && !!other.product_country &&
+        item.product_country.trim().toLocaleLowerCase() === other.product_country.trim().toLocaleLowerCase();
+      const sameCategory = (other.product_category ?? []).some(otherCategory =>
+        mine.some(category => Number(category.category_id) === Number(otherCategory.category_id)));
       return sameCountry || sameCategory;
     });
   }
 
   private shuffle<T>(items: T[]): T[] {
-    const a = [...items];
-    for (let i = a.length - 1; i > 0; i--) {
+    const shuffled = [...items];
+    for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return a;
+    return shuffled;
   }
-
-  // ---------- Navigation ----------
 
   goBack() {
-    this.location.back();
+    void this.router.navigateByUrl('/store');
   }
 
-  openItem(p: Product) {
-    const key = Number(p.type_id) === 2 ? 'bundleId' : 'productId';
-    this.router.navigate(['/product'], { queryParams: { [key]: p.product_id } });
+  openItem(product: Product) {
+    const key = Number(product.type_id) === 2 ? 'bundleId' : 'productId';
+    void this.router.navigate(['/product'], { queryParams: { [key]: product.product_id } });
   }
 
   goToReviews() {
     const queryParams = this.isBundle ? { bundleId: this.itemId } : { productId: this.itemId };
-    this.router.navigate(['/review'], { queryParams: this.itemId ? queryParams : {} });
+    void this.router.navigate(['/review'], { queryParams });
   }
-
-  // ---------- Likes ----------
 
   toggleLike() {
     this.liked = !this.liked;
     this.likeCount += this.liked ? 1 : -1;
-    // TODO: persist like count to the database
   }
-
-  // ---------- Alerts ----------
 
   private async message(header: string, message: string, buttons: any[] = ['Okay']) {
     const alert = await this.alerts.create({ header, message, buttons, cssClass: 'caravan-alert' });
@@ -164,45 +164,45 @@ export class ProductPage implements OnInit {
 
   private async isLoggedIn(): Promise<boolean> {
     try {
-      const res = await firstValueFrom(this.http.get<{ loggedIn: boolean }>('/api/isLoggedIn'));
-      return !!res?.loggedIn;
+      const response = await firstValueFrom(this.http.get<{ loggedIn: boolean }>('/api/isLoggedIn'));
+      return !!response?.loggedIn;
     } catch {
       return false;
     }
   }
 
-  // ---------- Cart ----------
-
   async addToCart() {
     if (!(await this.isLoggedIn())) return this.promptLogin();
-
     const alert = await this.alerts.create({
       header: 'ADD TO CART?',
       message: '🛒',
       cssClass: 'caravan-alert',
       buttons: [
         { text: 'No', role: 'cancel' },
-        { text: 'Yes', handler: () => this.confirmAddToCart() },
+        { text: 'Yes', handler: () => void this.confirmAddToCart() },
       ],
     });
     await alert.present();
   }
 
-  private confirmAddToCart() {
+  private async confirmAddToCart() {
     const type = this.isBundle ? 'bundle' : 'product';
     if (!this.itemId) return this.message('CART ERROR', 'Unable to identify this item.');
 
     let cart: CartItem[] = [];
-    try { cart = JSON.parse(localStorage.getItem('cart') || '[]'); } catch { cart = []; }
-
-    const exists = cart.some(i =>
-      i.isBundle === this.isBundle &&
-      Number(this.isBundle ? i.cartbundle_id : i.cartprod_id) === this.itemId &&
-      i.cartprod_size === this.size
-    );
-    if (exists) {
-      return this.message('ALREADY IN CART', `This ${type} with the selected size is already in your cart.`);
+    try {
+      const stored: unknown = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart = Array.isArray(stored) ? stored as CartItem[] : [];
+    } catch {
+      cart = [];
     }
+
+    const exists = cart.some(entry =>
+      entry.isBundle === this.isBundle &&
+      Number(this.isBundle ? entry.cartbundle_id : entry.cartprod_id) === this.itemId &&
+      entry.cartprod_size === this.size
+    );
+    if (exists) return this.message('ALREADY IN CART', `This ${type} with the selected size is already in your cart.`);
 
     cart.push({
       cartprod_id: this.isBundle ? null : this.itemId,
@@ -212,31 +212,25 @@ export class ProductPage implements OnInit {
       isBundle: this.isBundle,
     });
     localStorage.setItem('cart', JSON.stringify(cart));
-
     return this.message('SUCCESS', `Your ${type} has been added to your cart.`);
   }
 
-  // ---------- Wishlist ----------
-
   async addToWishlist() {
     if (!this.itemId) return this.message('WISHLIST ERROR', 'Unable to identify this item.');
-
     this.wishlistBusy = true;
     try {
-      const res = await firstValueFrom(
+      const response = await firstValueFrom(
         this.http.post<{ alreadyExists?: boolean }>('/api/addWishlist', { productId: this.itemId })
       );
-      if (res?.alreadyExists) {
-        return this.message('ALREADY IN WISHLIST', 'This item is already in your wishlist.');
-      }
+      if (response?.alreadyExists) return this.message('ALREADY IN WISHLIST', 'This item is already in your wishlist.');
       return this.message('WISHLIST', 'Item added to wishlist.');
     } catch (e) {
-      const err = e as HttpErrorResponse;
-      if (err.status === 401) return this.promptLogin();
-      if (err.status === 409 || err.error?.alreadyExists) {
+      const error = e as HttpErrorResponse;
+      if (error.status === 401) return this.promptLogin();
+      if (error.status === 409 || error.error?.alreadyExists) {
         return this.message('ALREADY IN WISHLIST', 'This item is already in your wishlist.');
       }
-      return this.message('WISHLIST ERROR', err.error?.error || 'Unable to add item to wishlist.');
+      return this.message('WISHLIST ERROR', error.error?.error || 'Unable to add item to wishlist.');
     } finally {
       this.wishlistBusy = false;
     }

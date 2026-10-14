@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonContent,
   IonIcon
@@ -15,15 +17,35 @@ import {
   cartOutline,
   checkmarkCircleOutline
 } from 'ionicons/icons';
+import { firstValueFrom } from 'rxjs';
 
 interface CartItem {
   id: number;
+  isBundle: boolean;
+  productId: number;
   name: string;
   size: string;
   category: string;
   price: number;
   quantity: number;
   image: string;
+}
+
+interface StoredCartItem {
+  cartprod_id: number | null;
+  cartbundle_id: number | null;
+  cartprod_size: string;
+  quantity: number;
+  isBundle: boolean;
+}
+
+interface CatalogProduct {
+  product_id: number;
+  type_id: number;
+  product_name: string;
+  product_image: string;
+  product_price: number;
+  product_category?: Array<{ category_name?: string }>;
 }
 
 interface Voucher {
@@ -53,7 +75,7 @@ type PaymentMethod = 'card' | 'cash' | null;
     IonIcon
   ]
 })
-export class CartPage {
+export class CartPage implements OnInit {
 
   shippingFee = 50;
 
@@ -69,35 +91,8 @@ export class CartPage {
 
   itemToDeleteId: number | null = null;
 
-  cartItems: CartItem[] = [
-    {
-      id: 1,
-      name: 'Paprika',
-      size: '8 oz',
-      category: 'Cooking',
-      price: 199.99,
-      quantity: 1,
-      image: 'assets/Images/pAPRIKA.jpg'
-    },
-    {
-      id: 2,
-      name: 'Ajwain Seeds',
-      size: '100 g',
-      category: 'Spices',
-      price: 125,
-      quantity: 2,
-      image: 'assets/Images/AjwainSeeds.jpg'
-    },
-    {
-      id: 3,
-      name: 'Cumin Seeds',
-      size: '100 g',
-      category: 'Spices',
-      price: 150,
-      quantity: 2,
-      image: 'assets/Images/CuminSeeds.jpg'
-    }
-  ];
+  cartItems: CartItem[] = [];
+  private storedCart: StoredCartItem[] = [];
 
   vouchers: Voucher[] = [
     {
@@ -123,7 +118,7 @@ export class CartPage {
     }
   ];
 
-  constructor() {
+  constructor(private http: HttpClient, private router: Router) {
     addIcons({
       add,
       remove,
@@ -133,6 +128,61 @@ export class CartPage {
       cartOutline,
       checkmarkCircleOutline
     });
+  }
+
+  ngOnInit(): void {
+    void this.loadCart();
+  }
+
+  private async loadCart(): Promise<void> {
+    try {
+      const parsed: unknown = JSON.parse(localStorage.getItem('cart') || '[]');
+      this.storedCart = Array.isArray(parsed) ? parsed as StoredCartItem[] : [];
+    } catch {
+      this.storedCart = [];
+    }
+    if (!this.storedCart.length) {
+      this.cartItems = [];
+      return;
+    }
+
+    try {
+      const products = await firstValueFrom(this.http.get<CatalogProduct[]>('/api/fetchProducts'));
+      const catalog = Array.isArray(products) ? products : [];
+      this.cartItems = this.storedCart.flatMap((entry, index) => {
+        const isBundle = !!entry.isBundle;
+        const productId = Number(isBundle ? entry.cartbundle_id : entry.cartprod_id);
+        const product = catalog.find(candidate => Number(candidate.product_id) === productId);
+        if (!product || (Number(product.type_id) === 2) !== isBundle) return [];
+        const ounces = entry.cartprod_size === '16oz' ? 16 : 8;
+        return [{
+          id: index + 1,
+          isBundle,
+          productId,
+          name: product.product_name,
+          size: `${ounces} oz`,
+          category: product.product_category?.[0]?.category_name || (isBundle ? 'Bundle' : 'Spices'),
+          price: Number(product.product_price) * ounces,
+          quantity: Math.max(1, Number(entry.quantity) || 1),
+          image: product.product_image,
+        }];
+      });
+      this.persistCart();
+    } catch (error) {
+      console.error('Unable to load cart products', error);
+      this.cartItems = [];
+    }
+  }
+
+  private persistCart(): void {
+    this.storedCart = this.cartItems.map(item => ({
+      cartprod_id: item.isBundle ? null : item.productId,
+      cartbundle_id: item.isBundle ? item.productId : null,
+      cartprod_size: item.size.replace(/\s/g, ''),
+      quantity: item.quantity,
+      isBundle: item.isBundle,
+    }));
+    localStorage.setItem('cart', JSON.stringify(this.storedCart));
   }
 
   get productsCost(): number {
@@ -180,11 +230,13 @@ export class CartPage {
 
   increaseQuantity(item: CartItem): void {
     item.quantity += 1;
+    this.persistCart();
   }
 
   decreaseQuantity(item: CartItem): void {
     if (item.quantity > 1) {
       item.quantity -= 1;
+      this.persistCart();
     }
   }
 
@@ -201,6 +253,7 @@ export class CartPage {
     this.cartItems = this.cartItems.filter(
       item => item.id !== this.itemToDeleteId
     );
+    this.persistCart();
 
     this.cancelDeleteItem();
   }
@@ -241,12 +294,12 @@ export class CartPage {
 
   continueShopping(): void {
     this.closeCheckoutResult();
-    console.log('Continue shopping clicked');
+    void this.router.navigateByUrl('/store');
   }
 
   viewOrders(): void {
     this.closeCheckoutResult();
-    console.log('View orders clicked');
+    void this.router.navigateByUrl('/orderhistory');
   }
 
   closeCheckoutResult(): void {
