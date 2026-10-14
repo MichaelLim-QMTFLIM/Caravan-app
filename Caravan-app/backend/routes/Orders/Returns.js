@@ -18,6 +18,7 @@ router.customPath = "/returns";
  * Body:
  * {
  *     "orderId": 5,
+ *     "subject": "Damaged product",
  *     "reason": "The product arrived damaged."
  * }
  */
@@ -25,6 +26,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
     try {
         const customerId = Number(req.user.userId);
         const orderId = Number(req.body.orderId);
+        const subject = String(req.body.subject || "").trim();
         const reason = String(req.body.reason || "").trim();
 
         if (!customerId) {
@@ -44,6 +46,20 @@ router.post("/", checkAuth("user"), async (req, res) => {
             });
         }
 
+        if (!subject) {
+            return res.status(400).json({
+                success: false,
+                error: "Refund subject is required"
+            });
+        }
+
+        if (subject.length > 255) {
+            return res.status(400).json({
+                success: false,
+                error: "Refund subject is too long"
+            });
+        }
+
         if (!reason) {
             return res.status(400).json({
                 success: false,
@@ -57,6 +73,9 @@ router.post("/", checkAuth("user"), async (req, res) => {
                 error: "Refund reason is too long"
             });
         }
+
+        // The Returns table has one text field, so preserve both form values there.
+        const submittedReason = `Subject: ${subject}\n\nReason: ${reason}`;
 
         /*
          * Verify that the order belongs to
@@ -85,10 +104,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
             });
         }
 
-        /*
-         * Prevent more than one active refund
-         * request for the same order.
-         */
+        /* Prevent a second refund request for the same order. */
         const existingReturn = await db.execute({
             sql: `
                 SELECT
@@ -96,10 +112,6 @@ router.post("/", checkAuth("user"), async (req, res) => {
                     Return_status
                 FROM Returns
                 WHERE Order_id = ?
-                AND Return_status IN (
-                    'Pending',
-                    'Approved'
-                )
             `,
             args: [orderId]
         });
@@ -138,7 +150,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
             `,
             args: [
                 orderId,
-                reason,
+                submittedReason,
                 refundAmount
             ]
         });
@@ -151,7 +163,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
             refundRequest: {
                 returnId,
                 orderId,
-                reason,
+                reason: submittedReason,
                 returnStatus: "Pending",
                 refundAmount
             }

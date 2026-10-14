@@ -57,6 +57,7 @@ router.get("/:orderId", checkAuth("user"), async (req, res) => {
                     o.Total_cost,
                     o.Shipping_fee,
                     o.Discount,
+                    so.Shipping_name,
 
                     a.Street_address,
                     a.City,
@@ -78,6 +79,9 @@ router.get("/:orderId", checkAuth("user"), async (req, res) => {
 
                 INNER JOIN Order_status os
                     ON o.Status_id = os.Status_id
+
+                LEFT JOIN Shipping_options so
+                    ON o.Shipping_id = so.Shipping_id
 
                 INNER JOIN Order_items oi
                     ON o.Order_id = oi.Order_id
