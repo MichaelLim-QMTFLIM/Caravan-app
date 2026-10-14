@@ -8,6 +8,22 @@
 
 ion-content { --background: var(--caravan-cream); }
 
+.orders-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgb(250 244 237 / 84%);
+  color: var(--caravan-brown);
+  text-align: center;
+
+  ion-spinner { --color: var(--caravan-brown); width: 46px; height: 46px; }
+  p { margin: 12px 0 0; }
+}
+
 .orders-page {
   width: min(100% - 36px, 1040px);
   margin: 46px auto 32px;
@@ -165,7 +181,7 @@ ion-content { --background: var(--caravan-cream); }
 
 .receipt-modal {
   display: flex;
-  max-height: min(88vh, 850px);
+  max-height: min(88dvh, 850px);
   flex-direction: column;
   padding: 22px 24px 18px;
 }
@@ -186,7 +202,13 @@ ion-content { --background: var(--caravan-cream); }
 .receipt-scroll { min-height: 0; overflow-y: auto; padding: 12px 2px 4px; }
 .receipt-order-heading { display: flex; justify-content: space-between; gap: 12px; padding: 16px 0; border-bottom: 1px solid #d3d3d3; }
 .receipt-status { color: var(--caravan-green); font-weight: 700; }
-.receipt-products { border-bottom: 1px solid #d3d3d3; }
+.receipt-products {
+  max-height: min(34dvh, 280px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-bottom: 1px solid #d3d3d3;
+  scrollbar-color: #987b65 transparent;
+}
 .receipt-product { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid #ddd; }
 .receipt-product:last-child { border-bottom: 0; }
 .receipt-product img { width: 68px; height: 68px; flex: 0 0 auto; border-radius: 8px; object-fit: cover; }

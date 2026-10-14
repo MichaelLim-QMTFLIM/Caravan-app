@@ -1,4 +1,11 @@
 <ion-content>
+  @if (loading) {
+    <div class="orders-loading-overlay" role="status" aria-live="polite">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading your orders…</p>
+    </div>
+  }
+
   <main class="orders-page">
     <h1>Your Order History</h1>
 

@@ -88,4 +88,26 @@
       </section>
     </main>
   }
+
+  @if (actionModalMode) {
+    <div class="product-modal-overlay" (click)="dismissActionModal()">
+      <section class="product-action-modal" role="dialog" aria-modal="true" aria-labelledby="product-action-title" (click)="$event.stopPropagation()">
+        <button class="action-modal-close" type="button" aria-label="Close" (click)="dismissActionModal()">×</button>
+        <div class="action-modal-icon" aria-hidden="true">{{ actionModalMode === 'confirm-cart' ? '🛒' : '✓' }}</div>
+        <h2 id="product-action-title">{{ actionModalTitle }}</h2>
+        <p>{{ actionModalMessage }}</p>
+        <div class="action-modal-buttons">
+          @if (actionModalMode === 'confirm-cart') {
+            <button type="button" class="modal-secondary" (click)="dismissActionModal()">No</button>
+            <button type="button" class="modal-primary" (click)="confirmAddToCart()">Yes</button>
+          } @else if (actionModalTitle === 'LOGIN REQUIRED' || actionModalTitle === 'Login Required') {
+            <button type="button" class="modal-secondary" (click)="dismissActionModal()">Cancel</button>
+            <button type="button" class="modal-primary" (click)="goToLogin()">Sign In</button>
+          } @else {
+            <button type="button" class="modal-primary" (click)="dismissActionModal()">Okay</button>
+          }
+        </div>
+      </section>
+    </div>
+  }
 </ion-content>

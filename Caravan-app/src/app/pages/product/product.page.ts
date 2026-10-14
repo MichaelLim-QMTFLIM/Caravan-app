@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, IonContent, IonSpinner } from '@ionic/angular';
+import { IonContent, IonSpinner } from '@ionic/angular';
 import { firstValueFrom, timeout } from 'rxjs';
 
 interface Category { category_id: number; }
@@ -45,6 +45,9 @@ export class ProductPage implements OnInit {
   liked = false;
   likeCount = 0;
   wishlistBusy = false;
+  actionModalMode: 'confirm-cart' | 'notice' | null = null;
+  actionModalTitle = '';
+  actionModalMessage = '';
   similar: Product[] = [];
   random: Product[] = [];
 
@@ -52,7 +55,6 @@ export class ProductPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient,
-    private alerts: AlertController,
     private changeDetector: ChangeDetectorRef,
   ) {}
 
@@ -150,16 +152,10 @@ export class ProductPage implements OnInit {
     this.likeCount += this.liked ? 1 : -1;
   }
 
-  private async message(header: string, message: string, buttons: any[] = ['Okay']) {
-    const alert = await this.alerts.create({ header, message, buttons, cssClass: 'caravan-alert' });
-    await alert.present();
-  }
-
-  private promptLogin() {
-    return this.message('LOGIN REQUIRED', 'You need to be logged in to add items to your cart.', [
-      { text: 'Cancel', role: 'cancel' },
-      { text: 'Login', handler: () => this.router.navigate(['/login']) },
-    ]);
+  private showNotice(title: string, message: string): void {
+    this.actionModalTitle = title;
+    this.actionModalMessage = message;
+    this.actionModalMode = 'notice';
   }
 
   private async isLoggedIn(): Promise<boolean> {
@@ -172,22 +168,18 @@ export class ProductPage implements OnInit {
   }
 
   async addToCart() {
-    if (!(await this.isLoggedIn())) return this.promptLogin();
-    const alert = await this.alerts.create({
-      header: 'ADD TO CART?',
-      message: '🛒',
-      cssClass: 'caravan-alert',
-      buttons: [
-        { text: 'No', role: 'cancel' },
-        { text: 'Yes', handler: () => void this.confirmAddToCart() },
-      ],
-    });
-    await alert.present();
+    if (!(await this.isLoggedIn())) {
+      this.showNotice('LOGIN REQUIRED', 'Sign in to add this item to your cart.');
+      return;
+    }
+    this.actionModalTitle = 'Add to Cart?';
+    this.actionModalMessage = `Add ${this.item?.product_name ?? 'this item'} (${this.size}) to your cart for ₱${this.price}?`;
+    this.actionModalMode = 'confirm-cart';
   }
 
-  private async confirmAddToCart() {
+  confirmAddToCart(): void {
     const type = this.isBundle ? 'bundle' : 'product';
-    if (!this.itemId) return this.message('CART ERROR', 'Unable to identify this item.');
+    if (!this.itemId) return this.showNotice('Cart Error', 'Unable to identify this item.');
 
     let cart: CartItem[] = [];
     try {
@@ -202,7 +194,7 @@ export class ProductPage implements OnInit {
       Number(this.isBundle ? entry.cartbundle_id : entry.cartprod_id) === this.itemId &&
       entry.cartprod_size === this.size
     );
-    if (exists) return this.message('ALREADY IN CART', `This ${type} with the selected size is already in your cart.`);
+    if (exists) return this.showNotice('Already in Cart', `This ${type} with the selected size is already in your cart.`);
 
     cart.push({
       cartprod_id: this.isBundle ? null : this.itemId,
@@ -212,25 +204,34 @@ export class ProductPage implements OnInit {
       isBundle: this.isBundle,
     });
     localStorage.setItem('cart', JSON.stringify(cart));
-    return this.message('SUCCESS', `Your ${type} has been added to your cart.`);
+    this.showNotice('Added to Cart', `Your ${type} has been added to your cart.`);
+  }
+
+  dismissActionModal(): void {
+    this.actionModalMode = null;
+  }
+
+  goToLogin(): void {
+    this.dismissActionModal();
+    void this.router.navigateByUrl('/login');
   }
 
   async addToWishlist() {
-    if (!this.itemId) return this.message('WISHLIST ERROR', 'Unable to identify this item.');
+    if (!this.itemId) return this.showNotice('Wishlist Error', 'Unable to identify this item.');
     this.wishlistBusy = true;
     try {
       const response = await firstValueFrom(
         this.http.post<{ alreadyExists?: boolean }>('/api/addWishlist', { productId: this.itemId })
       );
-      if (response?.alreadyExists) return this.message('ALREADY IN WISHLIST', 'This item is already in your wishlist.');
-      return this.message('WISHLIST', 'Item added to wishlist.');
+      if (response?.alreadyExists) return this.showNotice('Already in Wishlist', 'This item is already in your wishlist.');
+      return this.showNotice('Wishlist', 'Item added to your wishlist.');
     } catch (e) {
       const error = e as HttpErrorResponse;
-      if (error.status === 401) return this.promptLogin();
+      if (error.status === 401) return this.showNotice('Login Required', 'Sign in to add items to your wishlist.');
       if (error.status === 409 || error.error?.alreadyExists) {
-        return this.message('ALREADY IN WISHLIST', 'This item is already in your wishlist.');
+        return this.showNotice('Already in Wishlist', 'This item is already in your wishlist.');
       }
-      return this.message('WISHLIST ERROR', error.error?.error || 'Unable to add item to wishlist.');
+      return this.showNotice('Wishlist Error', error.error?.error || 'Unable to add item to wishlist.');
     } finally {
       this.wishlistBusy = false;
     }

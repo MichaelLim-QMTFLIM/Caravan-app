@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { IonContent, IonIcon } from '@ionic/angular';
+import { IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { person } from 'ionicons/icons';
 import { firstValueFrom } from 'rxjs';
@@ -47,10 +47,12 @@ interface WishlistItem {
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonIcon],
+  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonSpinner],
 })
 export class ProfilePage implements OnInit {
+  private readonly addressesPerPage = 5;
   activeTab: ProfileTab = 'overview';
+  addressPage = 1;
   customerName = '';
   customerEmail = '';
   isEditingProfile = false;
@@ -62,8 +64,10 @@ export class ProfilePage implements OnInit {
   showAddressModal = false;
   showSaveProfileModal = false;
   showDeleteAddressModal = false;
+  showDeleteWishlistModal = false;
   showLogoutModal = false;
   addressToDeleteId: number | null = null;
+  wishlistToDeleteId: number | null = null;
   editingAddressId: number | null = null;
 
   profile: Profile = { email: '', birthdate: '', firstName: '', lastName: '', password: '' };
@@ -88,6 +92,31 @@ export class ProfilePage implements OnInit {
 
   get addressToDelete(): Address | undefined {
     return this.addresses.find(address => address.id === this.addressToDeleteId);
+  }
+
+  get wishlistItemToDelete(): WishlistItem | undefined {
+    return this.wishlistItems.find(item => item.id === this.wishlistToDeleteId);
+  }
+
+  get addressPageCount(): number {
+    return Math.max(1, Math.ceil(this.addresses.length / this.addressesPerPage));
+  }
+
+  get paginatedAddresses(): Address[] {
+    const start = (this.addressPage - 1) * this.addressesPerPage;
+    return this.addresses.slice(start, start + this.addressesPerPage);
+  }
+
+  previousAddressPage(): void {
+    if (this.addressPage > 1) this.addressPage--;
+  }
+
+  nextAddressPage(): void {
+    if (this.addressPage < this.addressPageCount) this.addressPage++;
+  }
+
+  private clampAddressPage(): void {
+    this.addressPage = Math.min(this.addressPage, this.addressPageCount);
   }
 
   private async loadProfileData(): Promise<void> {
@@ -117,6 +146,7 @@ export class ProfilePage implements OnInit {
         city: row.City ?? row.city ?? '',
         zipCode: String(row.Zip_code ?? row.zip_code ?? ''),
       }));
+      this.clampAddressPage();
       this.vouchers = vouchers.filter(voucher =>
         String(voucher.Voucher_status ?? '').toLowerCase() === 'unused');
       this.wishlistItems = wishlist.map(item => ({
@@ -130,7 +160,7 @@ export class ProfilePage implements OnInit {
       console.error('Unable to load profile data:', error);
       this.error = error?.status === 401
         ? 'Please sign in to view your profile.'
-        : 'Unable to load your profile. Check that the backend is running, then retry.';
+        : 'Unable to load your profile. Please Check your Internet Connection.';
     } finally {
       this.loading = false;
       this.changeDetector.detectChanges();
@@ -246,6 +276,7 @@ export class ProfilePage implements OnInit {
         city: row.City ?? row.city ?? '',
         zipCode: String(row.Zip_code ?? row.zip_code ?? ''),
       })));
+      this.clampAddressPage();
     } catch (error: any) {
       console.error('Address save failed:', error);
       this.error = error?.error?.error || 'Unable to save this address.';
@@ -267,6 +298,7 @@ export class ProfilePage implements OnInit {
     try {
       await firstValueFrom(this.http.delete(`/api/addresses/${this.addressToDeleteId}`));
       this.addresses = this.addresses.filter(address => address.id !== this.addressToDeleteId);
+      this.clampAddressPage();
       this.addressToDeleteId = null;
       this.showDeleteAddressModal = false;
     } catch (error: any) {
@@ -288,12 +320,20 @@ export class ProfilePage implements OnInit {
     void this.router.navigate(['/product'], { queryParams: { [key]: item.id } });
   }
 
-  async deleteWishlistItem(itemId: number): Promise<void> {
+  requestDeleteWishlistItem(itemId: number): void {
+    this.wishlistToDeleteId = itemId;
+    this.showDeleteWishlistModal = true;
+  }
+
+  async confirmDeleteWishlistItem(): Promise<void> {
+    const itemId = this.wishlistToDeleteId;
+    if (itemId === null) return;
     this.busy = true;
     this.error = '';
     try {
       await firstValueFrom(this.http.delete(`/api/removeWishlist/${itemId}`));
       this.wishlistItems = this.wishlistItems.filter(item => item.id !== itemId);
+      this.cancelDeleteWishlistItem();
     } catch (error: any) {
       console.error('Wishlist removal failed:', error);
       this.error = error?.error?.error || 'Unable to remove this wishlist item.';
@@ -301,6 +341,11 @@ export class ProfilePage implements OnInit {
       this.busy = false;
       this.changeDetector.detectChanges();
     }
+  }
+
+  cancelDeleteWishlistItem(): void {
+    this.wishlistToDeleteId = null;
+    this.showDeleteWishlistModal = false;
   }
 
   logout(): void { this.showLogoutModal = true; }

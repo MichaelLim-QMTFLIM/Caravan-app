@@ -2,7 +2,10 @@
   <div class="profile-wrapper">
 
     @if (loading) {
-      <div class="page-message">Loading your profile…</div>
+      <div class="profile-loading-overlay" role="status" aria-live="polite">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Loading your profile…</p>
+      </div>
     }
 
     @if (error) {
@@ -175,7 +178,7 @@
           </button>
 
           <div class="card-list">
-            @for (address of addresses; track address.id) {
+            @for (address of paginatedAddresses; track address.id) {
               <div class="address-card">
                 <div class="address-information">
                   <strong>{{ address.street }}</strong>
@@ -206,6 +209,26 @@
               </div>
             }
           </div>
+
+          @if (addressPageCount > 1) {
+            <nav class="address-pagination" aria-label="Address pages">
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="previousAddressPage()"
+                [disabled]="addressPage === 1">
+                Previous
+              </button>
+              <span aria-live="polite">Page {{ addressPage }} of {{ addressPageCount }}</span>
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="nextAddressPage()"
+                [disabled]="addressPage === addressPageCount">
+                Next
+              </button>
+            </nav>
+          }
         </section>
       }
 
@@ -263,7 +286,7 @@
                     <button
                       type="button"
                       class="danger-btn small-btn"
-                      (click)="deleteWishlistItem(item.id)">
+                      (click)="requestDeleteWishlistItem(item.id)">
                       Delete
                     </button>
                   </div>
@@ -427,6 +450,24 @@
             (click)="cancelDeleteAddress()">
             Cancel
           </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showDeleteWishlistModal) {
+    <div class="modal-overlay" (click)="cancelDeleteWishlistItem()">
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="delete-wishlist-title" (click)="$event.stopPropagation()">
+        <h3 id="delete-wishlist-title">Remove from Wishlist?</h3>
+        <p>Are you sure you want to remove this item from your wishlist?</p>
+        @if (wishlistItemToDelete; as item) {
+          <div class="delete-address-preview">{{ item.name }}</div>
+        }
+        <div class="modal-actions">
+          <button type="button" class="danger-btn" [disabled]="busy" (click)="confirmDeleteWishlistItem()">
+            {{ busy ? 'Removing…' : 'Delete' }}
+          </button>
+          <button type="button" class="secondary-btn" [disabled]="busy" (click)="cancelDeleteWishlistItem()">Cancel</button>
         </div>
       </div>
     </div>

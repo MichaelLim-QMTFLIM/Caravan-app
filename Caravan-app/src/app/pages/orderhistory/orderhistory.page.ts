@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { IonContent } from '@ionic/angular';
+import { IonContent, IonSpinner } from '@ionic/angular';
 
 interface Order {
   orderId: number;
@@ -38,7 +38,7 @@ interface RefundRequest {
   templateUrl: './orderhistory.page.html',
   styleUrls: ['./orderhistory.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent],
+  imports: [CommonModule, FormsModule, IonContent, IonSpinner],
 })
 export class OrderhistoryPage implements OnInit {
   sortOption = 'date-desc';
@@ -128,7 +128,7 @@ export class OrderhistoryPage implements OnInit {
       console.error('Unable to load orders:', error);
       this.error = error?.status === 401
         ? 'Please sign in to see your orders.'
-        : 'Unable to load your orders. Check that the backend is running and try again.';
+        : 'Unable to load your orders. Please Check your Internet Connection.';
     } finally {
       this.loading = false;
       this.changeDetector.detectChanges();

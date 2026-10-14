@@ -10,6 +10,28 @@
   --ion-background-color: var(--caravan-cream);
 }
 
+.app-shell {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+}
+
+.app-header {
+  position: relative;
+  z-index: 20;
+  flex: 0 0 auto;
+}
+
+ion-router-outlet {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
 .sidebar-brand {
   display: grid;
   justify-items: center;

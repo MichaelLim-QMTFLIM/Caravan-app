@@ -45,6 +45,8 @@ export class RegisterPage implements OnDestroy {
     private auth: AuthService,
   ) {}
 
+  goBack(): void { void this.router.navigateByUrl('/login'); }
+
   // ---- Privacy modal ----
   openPrivacy(event: Event): void {
     event.preventDefault();

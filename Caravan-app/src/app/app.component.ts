@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from './services/auth.service';
+import { ConnectivityNoticeComponent } from './components/connectivity-notice.component';
 import {
   IonApp,
   IonButton,
@@ -46,6 +47,7 @@ interface NavigationItem {
     IonMenuToggle,
     IonRouterOutlet,
     IonToolbar,
+    ConnectivityNoticeComponent,
   ],
 })
 export class AppComponent implements OnInit, OnDestroy {
