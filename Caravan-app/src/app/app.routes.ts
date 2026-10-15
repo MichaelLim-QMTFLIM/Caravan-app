@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { CheckoutProcessingPage } from './pages/checkout-processing/checkout-processing.page';
+import { OrderConfirmationPage } from './pages/order-confirmation/order-confirmation.page';
 
 export const routes: Routes = [
   {
@@ -25,6 +27,14 @@ export const routes: Routes = [
   {
     path: 'cart',
     loadComponent: () => import('./pages/cart/cart.page').then( m => m.CartPage)
+  },
+  {
+    path: 'checkout/processing',
+    component: CheckoutProcessingPage,
+  },
+  {
+    path: 'checkout/confirmation/:orderId',
+    component: OrderConfirmationPage,
   },
   {
     path: 'profile',

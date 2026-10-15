@@ -1,0 +1,26 @@
+<ion-content>
+  <main class="confirmation-page">
+    <section class="confirmation-card">
+      <div class="confirmed-icon"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+      <p class="eyebrow">Caravan Market</p>
+      <h1>Order confirmed</h1>
+      <p class="intro">Thank you for shopping with Caravan. Your order has been placed successfully.</p>
+      <div class="order-number">Order number <strong>#{{ orderId }}</strong></div>
+
+      @if (loading) {
+        <div class="email-status"><ion-spinner name="crescent"></ion-spinner><span>Loading your receipt email…</span></div>
+      } @else if (email && emailSent) {
+        <p class="email-status">A receipt has been sent to <strong>{{ email }}</strong>.</p>
+      } @else if (emailSent) {
+        <p class="email-status">A receipt has been sent to the email on your account.</p>
+      } @else if (email) {
+        <p class="email-status email-warning">Your order is confirmed. We couldn't confirm receipt delivery to <strong>{{ email }}</strong>.</p>
+      }
+
+      <div class="confirmation-actions">
+        <a class="primary-link" routerLink="/orderhistory">View my orders</a>
+        <a class="secondary-link" routerLink="/store">Continue shopping</a>
+      </div>
+    </section>
+  </main>
+</ion-content>

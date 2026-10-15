@@ -1,0 +1,19 @@
+<ion-content>
+  <main class="processing-page">
+    <section class="processing-card" aria-live="polite">
+      @if (processing) {
+        <ion-spinner name="crescent"></ion-spinner>
+      }
+      <h1>{{ error ? 'Checkout needs attention' : (processing ? 'Processing your order' : 'Secure payment') }}</h1>
+      <p>{{ error || message }}</p>
+
+      @if (payload?.paymentType === 'paypal' && !error) {
+        <div id="paypal-button-container" class="paypal-button-container"></div>
+      }
+
+      @if (error || (payload?.paymentType === 'paypal' && !processing)) {
+        <button type="button" class="return-btn" (click)="returnToCart()">Return to cart</button>
+      }
+    </section>
+  </main>
+</ion-content>

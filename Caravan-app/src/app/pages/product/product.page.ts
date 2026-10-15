@@ -156,11 +156,14 @@ export class ProductPage implements OnInit {
     this.actionModalTitle = title;
     this.actionModalMessage = message;
     this.actionModalMode = 'notice';
+    this.changeDetector.detectChanges();
   }
 
   private async isLoggedIn(): Promise<boolean> {
     try {
-      const response = await firstValueFrom(this.http.get<{ loggedIn: boolean }>('/api/isLoggedIn'));
+      const response = await firstValueFrom(
+        this.http.get<{ loggedIn: boolean }>('/api/isLoggedIn').pipe(timeout({ first: 10000 }))
+      );
       return !!response?.loggedIn;
     } catch {
       return false;
@@ -175,6 +178,7 @@ export class ProductPage implements OnInit {
     this.actionModalTitle = 'Add to Cart?';
     this.actionModalMessage = `Add ${this.item?.product_name ?? 'this item'} (${this.size}) to your cart for ₱${this.price}?`;
     this.actionModalMode = 'confirm-cart';
+    this.changeDetector.detectChanges();
   }
 
   confirmAddToCart(): void {
@@ -219,9 +223,11 @@ export class ProductPage implements OnInit {
   async addToWishlist() {
     if (!this.itemId) return this.showNotice('Wishlist Error', 'Unable to identify this item.');
     this.wishlistBusy = true;
+    this.changeDetector.detectChanges();
     try {
       const response = await firstValueFrom(
         this.http.post<{ alreadyExists?: boolean }>('/api/addWishlist', { productId: this.itemId })
+          .pipe(timeout({ first: 10000 }))
       );
       if (response?.alreadyExists) return this.showNotice('Already in Wishlist', 'This item is already in your wishlist.');
       return this.showNotice('Wishlist', 'Item added to your wishlist.');
@@ -234,6 +240,7 @@ export class ProductPage implements OnInit {
       return this.showNotice('Wishlist Error', error.error?.error || 'Unable to add item to wishlist.');
     } finally {
       this.wishlistBusy = false;
+      this.changeDetector.detectChanges();
     }
   }
 }

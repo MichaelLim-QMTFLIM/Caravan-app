@@ -33,6 +33,9 @@ export class AuthService {
     } catch {
       // Clear the local account state even when the API is offline.
     } finally {
+      localStorage.removeItem('cart');
+      sessionStorage.removeItem('pendingCheckout');
+      sessionStorage.removeItem('checkoutConfirmation');
       this.isAuthenticated.set(false);
       this.ready.set(true);
     }

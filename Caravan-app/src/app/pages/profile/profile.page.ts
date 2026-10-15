@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { person } from 'ionicons/icons';
@@ -81,12 +81,16 @@ export class ProfilePage implements OnInit {
     private readonly http: HttpClient,
     private readonly auth: AuthService,
     private readonly router: Router,
+    private readonly route: ActivatedRoute,
     private readonly changeDetector: ChangeDetectorRef,
   ) {
     addIcons({ person });
   }
 
   ngOnInit(): void {
+    if (this.route.snapshot.queryParamMap.get('tab') === 'addresses') {
+      this.activeTab = 'addresses';
+    }
     void this.loadProfileData();
   }
 

@@ -1,0 +1,8 @@
+ion-content { --background: #faf4ed; }
+.processing-page { display: grid; min-height: 100%; padding: 24px; place-items: center; }
+.processing-card { width: min(100%, 520px); padding: 36px 28px; border: 1px solid #e8e0d8; border-radius: 16px; background: white; color: #303030; text-align: center; box-shadow: 0 4px 16px #00000016; }
+.processing-card ion-spinner { width: 44px; height: 44px; --color: #6f4e37; }
+.processing-card h1 { margin: 16px 0 8px; color: #553b29; font-family: Georgia, serif; font-size: 26px; font-weight: 500; }
+.processing-card p { margin: 0; color: #625b56; line-height: 1.5; }
+.paypal-button-container { width: min(100%, 320px); margin: 24px auto 0; }
+.return-btn { min-height: 42px; margin-top: 20px; padding: 8px 18px; border: 1px solid #6f4e37; border-radius: 8px; background: white; color: #6f4e37; font-weight: 600; cursor: pointer; }
