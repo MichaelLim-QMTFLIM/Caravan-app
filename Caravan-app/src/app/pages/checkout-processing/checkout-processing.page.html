@@ -1,14 +1,21 @@
 <ion-content>
   <main class="processing-page">
     <section class="processing-card" aria-live="polite">
+      @if (payload?.paymentType === 'paypal') {
+        <div class="payment-mark" aria-hidden="true">P</div>
+        <p class="eyebrow">SECURE PAYPAL CHECKOUT</p>
+      } @else {
+        <div class="payment-mark cash-mark" aria-hidden="true">✓</div>
+        <p class="eyebrow">CASH ON DELIVERY</p>
+      }
+
       @if (processing) {
         <ion-spinner name="crescent"></ion-spinner>
       }
-      <h1>{{ error ? 'Checkout needs attention' : (processing ? 'Processing your order' : 'Secure payment') }}</h1>
-      <p>{{ error || message }}</p>
-
-      @if (isBrowserPaypal && payload?.paymentType === 'paypal' && !error) {
-        <div id="paypal-button-container" class="paypal-button-container"></div>
+      <h1>{{ error ? 'Checkout needs attention' : (processing ? 'Preparing your order' : 'Checkout update') }}</h1>
+      <p class="status-message">{{ error || message }}</p>
+      @if (payload?.paymentType === 'paypal' && !error) {
+        <p class="security-note">PayPal will open its secure approval flow and return you here. Your order is saved after PayPal confirms payment.</p>
       }
 
       @if (error || (payload?.paymentType === 'paypal' && !processing)) {

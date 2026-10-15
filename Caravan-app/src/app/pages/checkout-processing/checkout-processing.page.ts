@@ -17,10 +17,6 @@ interface CheckoutPayload {
   totalCost: number;
 }
 
-declare global {
-  interface Window { paypal?: any; }
-}
-
 @Component({
   selector: 'app-checkout-processing',
   standalone: true,
@@ -36,8 +32,8 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
   private viewReady = false;
   private submittingOrder = false;
 
-  get isBrowserPaypal(): boolean {
-    return !Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android';
+  get isAndroidApp(): boolean {
+    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
   }
 
   constructor(private readonly http: HttpClient, private readonly router: Router) {}
@@ -69,58 +65,18 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
 
   private async startPaypalCheckout(): Promise<void> {
     if (!this.payload || !this.viewReady || this.error) return;
+    if (!this.isAndroidApp) {
+      this.showError('PayPal checkout is available in the installed Caravan Android app. Open the app to approve payment; cash on delivery is available in this browser.');
+      return;
+    }
     this.processing = true;
-    this.message = 'Loading secure PayPal checkout…';
+    this.message = 'Preparing secure PayPal checkout…';
     try {
-      if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
-        await this.startAndroidPaypalCheckout();
-      } else {
-        await this.startBrowserPaypalCheckout();
-      }
+      await this.startAndroidPaypalCheckout();
     } catch (error: any) {
       console.error('Unable to initialize PayPal:', error);
       this.showError(error?.error?.error || error?.message || 'Unable to load PayPal checkout.');
     }
-  }
-
-  private async startBrowserPaypalCheckout(): Promise<void> {
-    await this.loadPaypalSdk();
-    const paypal = window.paypal;
-    if (!paypal) throw new Error('PayPal checkout is unavailable. Please try again.');
-
-    await paypal.Buttons({
-      fundingSource: paypal.FUNDING.PAYPAL,
-      style: { layout: 'vertical', label: 'paypal' },
-      createOrder: async () => {
-        const result = await firstValueFrom(this.http.post<{ id: string }>('/paypal/create-order', {
-          totalCost: this.payload?.totalCost,
-          addressId: this.payload?.addressId,
-        }));
-        if (!result?.id) throw new Error('Unable to start PayPal payment.');
-        return result.id;
-      },
-      onApprove: async (data: { orderID: string }, actions: { restart: () => Promise<void> }) => {
-        this.message = 'Confirming your PayPal payment…';
-        this.processing = true;
-        if (await this.submitOrder(data.orderID)) {
-          this.error = '';
-          this.processing = true;
-          this.message = 'Choose another payment method in PayPal to continue.';
-          await actions.restart();
-        }
-      },
-      onCancel: () => {
-        this.processing = false;
-        this.message = 'Payment was cancelled. Your cart is still saved.';
-      },
-      onError: (error: unknown) => {
-        console.error('PayPal checkout failed:', error);
-        this.showError('PayPal could not complete your payment. Your cart is still saved.');
-      },
-    }).render('#paypal-button-container');
-
-    this.processing = false;
-    this.message = 'Approve your payment securely with PayPal.';
   }
 
   private async startAndroidPaypalCheckout(): Promise<void> {
@@ -133,8 +89,9 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
     });
 
     // PayPal recommends preparing its shopper session alongside server order creation.
+    const profile = await firstValueFrom(this.http.get<{ email?: string }>('/api/profile')).catch(() => null);
     const [, order] = await Promise.all([
-      PayPalNative.createPayPalSession({}),
+      PayPalNative.createPayPalSession({ email: profile?.email }),
       firstValueFrom(this.http.post<{ id: string }>('/paypal/create-order', {
         totalCost: this.payload.totalCost,
         addressId: this.payload.addressId,
@@ -156,19 +113,6 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
     await this.submitOrder(approval.orderId || order.id);
   }
 
-  private async loadPaypalSdk(): Promise<void> {
-    if (window.paypal) return;
-    const config = await firstValueFrom(this.http.get<{ clientId: string }>('/paypal/config'));
-    if (!config?.clientId) throw new Error('PayPal is not configured.');
-
-    await new Promise<void>((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(config.clientId)}&currency=PHP&intent=capture`;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Unable to load PayPal checkout.'));
-      document.head.appendChild(script);
-    });
-  }
 
   private async submitOrder(paypalOrderId?: string): Promise<boolean> {
     if (!this.payload || this.submittingOrder) return false;
