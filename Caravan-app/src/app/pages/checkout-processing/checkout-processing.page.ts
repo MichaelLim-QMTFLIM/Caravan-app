@@ -36,6 +36,10 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
   private viewReady = false;
   private submittingOrder = false;
 
+  get isBrowserPaypal(): boolean {
+    return !Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android';
+  }
+
   constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
   ngOnInit(): void {
@@ -70,45 +74,53 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
     try {
       if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
         await this.startAndroidPaypalCheckout();
-        return;
+      } else {
+        await this.startBrowserPaypalCheckout();
       }
-
-      await this.loadPaypalSdk();
-      const paypal = window.paypal;
-      if (!paypal) throw new Error('PayPal checkout is unavailable. Please try again.');
-
-      await paypal.Buttons({
-        fundingSource: paypal.FUNDING.PAYPAL,
-        style: { layout: 'vertical', label: 'paypal' },
-        createOrder: async () => {
-          const result = await firstValueFrom(this.http.post<{ id: string }>('/paypal/create-order', {
-            totalCost: this.payload?.totalCost,
-            addressId: this.payload?.addressId,
-          }));
-          if (!result?.id) throw new Error('Unable to start PayPal payment.');
-          return result.id;
-        },
-        onApprove: async (data: { orderID: string }) => {
-          this.message = 'Confirming your PayPal payment…';
-          this.processing = true;
-          await this.submitOrder(data.orderID);
-        },
-        onCancel: () => {
-          this.processing = false;
-          this.message = 'Payment was cancelled. Your cart is still saved.';
-        },
-        onError: (error: unknown) => {
-          console.error('PayPal checkout failed:', error);
-          this.showError('PayPal could not complete your payment. Your cart is still saved.');
-        },
-      }).render('#paypal-button-container');
-
-      this.processing = false;
-      this.message = 'Approve your payment securely with PayPal.';
     } catch (error: any) {
       console.error('Unable to initialize PayPal:', error);
       this.showError(error?.error?.error || error?.message || 'Unable to load PayPal checkout.');
     }
+  }
+
+  private async startBrowserPaypalCheckout(): Promise<void> {
+    await this.loadPaypalSdk();
+    const paypal = window.paypal;
+    if (!paypal) throw new Error('PayPal checkout is unavailable. Please try again.');
+
+    await paypal.Buttons({
+      fundingSource: paypal.FUNDING.PAYPAL,
+      style: { layout: 'vertical', label: 'paypal' },
+      createOrder: async () => {
+        const result = await firstValueFrom(this.http.post<{ id: string }>('/paypal/create-order', {
+          totalCost: this.payload?.totalCost,
+          addressId: this.payload?.addressId,
+        }));
+        if (!result?.id) throw new Error('Unable to start PayPal payment.');
+        return result.id;
+      },
+      onApprove: async (data: { orderID: string }, actions: { restart: () => Promise<void> }) => {
+        this.message = 'Confirming your PayPal payment…';
+        this.processing = true;
+        if (await this.submitOrder(data.orderID)) {
+          this.error = '';
+          this.processing = true;
+          this.message = 'Choose another payment method in PayPal to continue.';
+          await actions.restart();
+        }
+      },
+      onCancel: () => {
+        this.processing = false;
+        this.message = 'Payment was cancelled. Your cart is still saved.';
+      },
+      onError: (error: unknown) => {
+        console.error('PayPal checkout failed:', error);
+        this.showError('PayPal could not complete your payment. Your cart is still saved.');
+      },
+    }).render('#paypal-button-container');
+
+    this.processing = false;
+    this.message = 'Approve your payment securely with PayPal.';
   }
 
   private async startAndroidPaypalCheckout(): Promise<void> {
@@ -158,8 +170,8 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
     });
   }
 
-  private async submitOrder(paypalOrderId?: string): Promise<void> {
-    if (!this.payload || this.submittingOrder) return;
+  private async submitOrder(paypalOrderId?: string): Promise<boolean> {
+    if (!this.payload || this.submittingOrder) return false;
     this.submittingOrder = true;
     this.processing = true;
     this.error = '';
@@ -182,9 +194,16 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
         paymentType: this.payload.paymentType,
       }));
       await this.router.navigate(['/checkout/confirmation', result.orderId]);
+      return false;
     } catch (error: any) {
       console.error('Checkout failed:', error);
+      const checkoutError = String(error?.error?.error || error?.error?.issue || '');
+      if (checkoutError.includes('INSTRUMENT_DECLINED')) {
+        this.showError('PayPal declined this payment method. Choose another payment method in PayPal to try again.');
+        return true;
+      }
       this.showError(error?.error?.error || error?.message || 'Unable to place your order. Your cart is still saved.');
+      return false;
     } finally {
       this.submittingOrder = false;
     }

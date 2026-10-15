@@ -324,6 +324,7 @@ router.post("/", checkAuth("user"), async (req, res) => {
                 console.error("PayPal capture error:", paymentError.response?.data || paymentError.message);
                 const checkoutPaymentError = new Error(paymentError.message || "PayPal payment could not be captured");
                 checkoutPaymentError.statusCode = paymentError.statusCode || 402;
+                checkoutPaymentError.issue = paymentError.issue;
                 throw checkoutPaymentError;
             }
         }
@@ -498,7 +499,8 @@ router.post("/", checkAuth("user"), async (req, res) => {
         return res.status(error.statusCode || 500).json({
             success: false,
             error: 
-                error.message || "Checkout failed"
+                error.message || "Checkout failed",
+            ...(error.issue ? { issue: error.issue } : {})
         });
     }
 });

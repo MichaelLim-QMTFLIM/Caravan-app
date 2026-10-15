@@ -37,6 +37,7 @@ function paymentApiError(error, operation) {
     const message = detailMessage || error.response?.data?.message || error.message;
     const debugId = error.response?.data?.debug_id;
     const wrapped = new Error(`${operation} failed${message ? `: ${message}` : ""}${debugId ? ` (PayPal debug ID: ${debugId})` : ""}`);
+    wrapped.issue = details.find(detail => detail.issue)?.issue;
     wrapped.statusCode = 402;
     return wrapped;
 }
@@ -195,7 +196,7 @@ async function captureOrder(orderId, customerId, expectedTotal) {
 
     let response;
     try {
-        const requestId = `capture-${crypto.createHash("sha256").update(orderId).digest("hex").slice(0, 24)}`;
+        const requestId = `capture-${crypto.randomBytes(15).toString("hex")}`;
         response = await axios.post(
             `${process.env.PAYPAL_API.replace(/\/$/, "")}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`,
             {},

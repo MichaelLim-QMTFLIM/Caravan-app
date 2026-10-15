@@ -7,7 +7,7 @@
       <h1>{{ error ? 'Checkout needs attention' : (processing ? 'Processing your order' : 'Secure payment') }}</h1>
       <p>{{ error || message }}</p>
 
-      @if (payload?.paymentType === 'paypal' && !error) {
+      @if (isBrowserPaypal && payload?.paymentType === 'paypal' && !error) {
         <div id="paypal-button-container" class="paypal-button-container"></div>
       }
 
