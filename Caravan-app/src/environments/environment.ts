@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  // Android Studio emulator host alias. For a physical device, use the
+  // development computer's LAN IP or switch to localhost with `adb reverse`.
+  androidApiBaseUrl: 'http://10.0.2.2:3000',
 };
 
 /*

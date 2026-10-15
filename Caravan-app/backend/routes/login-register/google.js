@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express.Router();
+const crypto = require("crypto");
 
 const db = require("../../imports/database");
 const jwt = require("jsonwebtoken");
@@ -12,6 +13,29 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL;
 const FRONTEND_URL = (process.env.FRONTEND_URL || "http://localhost:8100").replace(/\/$/, "");
+const allowedFrontendOrigins = new Set([
+  new URL(FRONTEND_URL).origin,
+  "http://localhost",
+  "http://localhost:8100",
+  "https://localhost",
+  "capacitor://localhost",
+  ...(process.env.CORS_ORIGINS || "").split(",").map((origin) => origin.trim()).filter(Boolean),
+]);
+
+function getReturnOrigin(value) {
+  try {
+    const origin = new URL(String(value || FRONTEND_URL)).origin;
+    return allowedFrontendOrigins.has(origin) ? origin : FRONTEND_URL;
+  } catch {
+    return FRONTEND_URL;
+  }
+}
+
+function clearGoogleState(res) {
+  const options = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/api/auth/google/callback" };
+  res.clearCookie("google_oauth_state", options);
+  res.clearCookie("google_oauth_return", options);
+}
 
 const googleClient = new OAuth2Client(
   GOOGLE_CLIENT_ID,
@@ -27,12 +51,23 @@ app.customPath = "/api";
  */
 app.get("/auth/google", (req, res) => {
   console.log("Route hit: /auth/google");
+  const state = crypto.randomBytes(24).toString("hex");
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 5 * 60 * 1000,
+    path: "/api/auth/google/callback",
+  };
+  res.cookie("google_oauth_state", state, cookieOptions);
+  res.cookie("google_oauth_return", getReturnOrigin(req.query.returnTo), cookieOptions);
   const url = googleClient.generateAuthUrl({
     access_type: "offline",
 
     scope: ["openid", "email", "profile"],
 
     prompt: "select_account",
+    state,
   });
 
   res.redirect(url);
@@ -43,11 +78,15 @@ app.get("/auth/google", (req, res) => {
  * Google redirects the user here
  */
 app.get("/auth/google/callback", async (req, res) => {
+  const frontendOrigin = getReturnOrigin(req.cookies?.google_oauth_return);
   try {
     const { code } = req.query;
+    const stateMatches = typeof req.query.state === "string" &&
+      req.cookies?.google_oauth_state === req.query.state;
+    clearGoogleState(res);
 
-    if (!code) {
-      return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
+    if (!code || !stateMatches) {
+      return res.redirect(`${frontendOrigin}/login?error=google_auth`);
     }
 
     /*
@@ -67,7 +106,7 @@ app.get("/auth/google/callback", async (req, res) => {
     const payload = ticket.getPayload();
 
     if (!payload) {
-      return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
+      return res.redirect(`${frontendOrigin}/login?error=google_auth`);
     }
 
     const {
@@ -79,7 +118,7 @@ app.get("/auth/google/callback", async (req, res) => {
     } = payload;
 
     if (!email || !email_verified) {
-      return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
+      return res.redirect(`${frontendOrigin}/login?error=google_auth`);
     }
 
     /*
@@ -122,7 +161,7 @@ app.get("/auth/google/callback", async (req, res) => {
       });
 
       if (result.affectedRows === 0) {
-        return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
+        return res.redirect(`${frontendOrigin}/login?error=google_auth`);
       }
 
       /*
@@ -168,10 +207,11 @@ app.get("/auth/google/callback", async (req, res) => {
     /*
      * Send the user back to your frontend.
      */
-    return res.redirect(`${FRONTEND_URL}/home`);
+    return res.redirect(`${frontendOrigin}/home`);
   } catch (err) {
     console.error("Google login error:", err);
-    return res.redirect(`${FRONTEND_URL}/login?error=google_auth`);
+    clearGoogleState(res);
+    return res.redirect(`${frontendOrigin}/login?error=google_auth`);
   }
 });
 

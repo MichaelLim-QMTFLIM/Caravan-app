@@ -1,6 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
+// Keep Kotlin bytecode aligned with the Java 21 target used by Capacitor and
+// supported Android Studio JDKs. Without this, newer JDKs can make Kotlin
+// infer an unsupported target and Gradle rejects the mixed targets.
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = '21'
+    }
+}
+
 android {
     namespace = "io.ionic.starter"
     compileSdk = rootProject.ext.compileSdkVersion

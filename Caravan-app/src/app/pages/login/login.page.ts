@@ -7,6 +7,7 @@ import { IonContent } from '@ionic/angular';
 import { IonIcon } from '@ionic/angular';
 import { firstValueFrom, Subscription, take } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { apiEndpoint } from '../../services/api-endpoint';
 
 interface LoginResponse {
   error?: string;
@@ -21,6 +22,7 @@ interface LoginResponse {
   imports: [IonContent, FormsModule, NgIf, RouterLink, IonIcon],
 })
 export class LoginPage implements OnInit, OnDestroy {
+  readonly googleLoginUrl = apiEndpoint(`/api/auth/google?returnTo=${encodeURIComponent(window.location.origin)}`);
   email = '';
   password = '';
   showPassword = false;
