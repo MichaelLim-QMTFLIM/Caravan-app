@@ -1,17 +1,15 @@
-/* Fonts (root-relative: assumes fonts live in src/assets/Fonts and the app is served from "/") */
-@font-face { font-family: EncodeSans_GC_Semi; src: url('/assets/Fonts/EncodeSans_SC/EncodeSansSC-SemiBold.ttf'); }
-@font-face { font-family: Merriweather_Semi;  src: url('/assets/Fonts/Merriweather/Merriweather_120pt-SemiBold.ttf'); }
+@font-face { font-family: Merriweather_Semi; src: url('/assets/Fonts/Merriweather/Merriweather_120pt-SemiBold.ttf'); }
 @font-face { font-family: InstrumentSans_Semi; src: url('/assets/Fonts/InstrumentSans/InstrumentSans-SemiBold.ttf'); }
-@font-face { font-family: InstrumentSans;      src: url('/assets/Fonts/InstrumentSans/InstrumentSans-Regular.ttf'); }
+@font-face { font-family: InstrumentSans; src: url('/assets/Fonts/InstrumentSans/InstrumentSans-Regular.ttf'); }
 
 :host {
-  --color-primary: #6F4E37;
-  --color-secondary: #FFF6EC;
-  --color-gold-star: #E2B02B;
-  --color-card-bg: #FFFFFF;
-  --color-text-dark: #333333;
-  --color-text-muted: #777777;
-  --color-border-gray: #E2E2E2;
+  --color-primary: #6f4e37;
+  --color-secondary: #fff6ec;
+  --color-gold-star: #e2b02b;
+  --color-text-dark: #333;
+  --color-text-muted: #777;
+  --color-border-gray: #e2e2e2;
+  display: block;
 }
 
 * { box-sizing: border-box; }
@@ -22,116 +20,99 @@ ion-content {
   color: var(--color-text-dark);
 }
 
-.page-header {
-  padding: 40px 20px 20px; max-width: 1100px; margin: 0 auto;
-  h1 { font-family: Merriweather_Semi, serif; font-size: 32px; color: #2D2D2D; margin: 0; }
-}
+.page-header { max-width: 1020px; margin: 0 auto; padding: 34px 20px 18px; }
+.page-header h1 { margin: 0; color: #2d2d2d; font: 28px Merriweather_Semi, Georgia, serif; }
+.reviews-container { max-width: 1020px; margin: 0 auto 60px; padding: 0 20px; }
+.page-error { padding: 16px; background: #fff; border-radius: 10px; color: #a3293d; }
 
-.reviews-container { max-width: 1100px; margin: 0 auto 60px; padding: 0 20px; }
+.product-overview-card, .your-review-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 5%);
+  margin-bottom: 22px;
+}
+.product-overview-card { display: flex; align-items: center; gap: 30px; }
+.product-image-container { flex: 0 0 216px; }
+.product-image { display: block; width: 216px; height: 216px; object-fit: cover; border-radius: 11px; background: #f3eee8; }
+.product-details { flex: 1; min-width: 0; }
+.product-details h2, .your-review-heading h2 { margin: 0 0 8px; color: #2d2d2d; font: 21px Merriweather_Semi, Georgia, serif; }
+.origin-text { margin: 0 0 10px; color: #666; font-size: 13px; }
+.description-text { max-width: 620px; margin: 0 0 13px; color: #555; font-size: 13px; line-height: 1.5; }
+.hero-stars { margin-bottom: 4px; color: var(--color-gold-star); font-size: 21px; letter-spacing: 2px; }
+.score-text { font: 16px InstrumentSans_Semi, sans-serif; color: #2d2d2d; }
+.review-count { margin: 2px 0 14px; color: var(--color-text-muted); font-size: 11px; }
+.leave-review-btn, .edit-review-btn, .submit-btn, .save-btn, .delete-btn, .cancel-btn {
+  border: 0; border-radius: 7px; padding: 10px 20px; font: 13px InstrumentSans_Semi, sans-serif; cursor: pointer;
+}
+.leave-review-btn, .submit-btn { background: var(--color-primary); color: #fff; }
+.leave-review-btn:hover, .submit-btn:hover:not(:disabled) { background: #563c2a; }
+.edit-review-btn, .save-btn { background: #52785d; color: #fff; }
+.edit-review-btn:hover, .save-btn:hover:not(:disabled) { background: #42654d; }
+.delete-btn { background: #ad263d; color: #fff; }
+.cancel-btn { background: #fff; color: #444; border: 1px solid #aaa; }
+button:disabled { opacity: .6; cursor: not-allowed; }
 
-/* Hero */
-.product-overview-card {
-  background: var(--color-card-bg); border-radius: 16px; padding: 30px;
-  display: flex; gap: 35px; align-items: center; margin-bottom: 25px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, .05);
-}
-.product-image-container { flex-shrink: 0; }
-.product-image { width: 240px; height: 240px; object-fit: cover; border-radius: 12px; }
-.product-details {
-  flex: 1;
-  h2 { font-family: Merriweather_Semi, serif; font-size: 24px; margin: 0 0 10px; color: #2D2D2D; }
-}
-.origin-text { font-size: 14px; color: #666; margin-bottom: 12px; }
-.description-text { font-size: 14px; color: #555; line-height: 1.5; margin-bottom: 16px; max-width: 600px; }
-.hero-stars { color: var(--color-gold-star); font-size: 20px; margin-bottom: 8px; display: flex; gap: 4px; }
-.score-text { font-family: InstrumentSans_Semi, sans-serif; font-size: 18px; color: #2D2D2D; }
-.review-count { font-size: 12px; color: var(--color-text-muted); margin-bottom: 18px; }
+.your-review-card { padding: 24px 26px 26px; }
+.your-review-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.your-review-heading h2 { margin: 0 0 12px; font-size: 17px; color: var(--color-primary); }
+.your-rating { display: flex; gap: 14px; align-items: center; font-size: 12px; }
+.stars { color: var(--color-gold-star); letter-spacing: 2px; white-space: nowrap; }
+.your-review-card h3 { margin: 17px 0 0; font: 14px InstrumentSans_Semi, sans-serif; }
+.your-review-text { margin: 22px 14px 30px; color: #666; font-size: 14px; line-height: 1.55; }
+.review-date { display: block; color: #929292; font-size: 11px; }
 
-.leave-review-btn {
-  background: var(--color-primary); color: #fff; border: none; padding: 10px 24px;
-  border-radius: 8px; font-family: InstrumentSans_Semi, sans-serif; font-size: 14px;
-  cursor: pointer; transition: background-color .2s;
-  &:hover { background: #563C2A; }
-}
+.pagination { display: flex; align-items: center; gap: 10px; margin: 0 0 18px; color: #777; font-size: 12px; }
+.pagination-bottom { justify-content: flex-end; margin: 18px 0 0; }
+.control-btn { width: 31px; height: 31px; border: 1px solid #ccc; border-radius: 50%; background: #fff; color: #555; cursor: pointer; }
+.control-btn:hover:not(:disabled) { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.control-btn:disabled { opacity: .45; cursor: default; }
+.reviews-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.no-reviews { grid-column: 1 / -1; padding: 44px 16px; text-align: center; color: #888; }
+.review-card { min-height: 170px; border-radius: 12px; background: #fff; box-shadow: 0 4px 12px rgb(0 0 0 / 5%); }
+.review-card-body { height: 100%; padding: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
+.reviewer-name { margin: 0; color: #333; font-size: 12px; }
+.review-rating { display: flex; gap: 4px; align-items: center; color: #555; font-size: 11px; }
+.review-rating .stars { font-size: 13px; }
+.review-title { margin: 4px 0 0; color: #2d2d2d; font: 13px InstrumentSans_Semi, sans-serif; }
+.review-comment { margin: 0; color: #555; font-size: 11px; line-height: 1.45; }
+.review-card .review-date { margin-top: auto; padding-top: 8px; }
 
-/* Carousel controls */
-.carousel-controls { display: flex; gap: 10px; margin-bottom: 20px; }
-.control-btn {
-  width: 32px; height: 32px; border-radius: 50%; border: 1px solid #CCC; background: #FFF;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-family: InstrumentSans_Semi, sans-serif; font-size: 14px; color: #555; transition: all .2s;
-  &:hover { background: var(--color-primary); color: #FFF; border-color: var(--color-primary); }
-}
+.dialog-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 18px; background: rgb(0 0 0 / 50%); }
+.dialog-box, .confirm-box { width: min(440px, 100%); max-height: calc(100vh - 36px); overflow-y: auto; border-radius: 12px; padding: 22px; background: #fff; box-shadow: 0 10px 25px rgb(0 0 0 / 18%); }
+.confirm-box { width: min(520px, 100%); padding: 24px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.modal-header h2 { margin: 0; color: #2d2d2d; font: 17px Merriweather_Semi, Georgia, serif; }
+.close-modal { border: 0; background: transparent; color: #222; font-size: 21px; cursor: pointer; }
+.form-field-group { display: flex; flex-direction: column; margin-bottom: 14px; }
+.form-field-group label { margin-bottom: 6px; color: #555; font: 11px InstrumentSans_Semi, sans-serif; }
+.radius-10-input, .custom-input-box { width: 100%; border: 1px solid var(--color-border-gray); border-radius: 8px; padding: 10px 12px; background: #f5f5f5; font: 12px InstrumentSans, sans-serif; outline: none; }
+.radius-10-input:focus, .custom-input-box:focus { border-color: var(--color-primary); background: #fff; }
+.custom-input-box { resize: vertical; min-height: 105px; }
+.star-rating-select { display: flex; gap: 4px; }
+.star-rating-select .star { padding: 0; border: 0; background: transparent; color: #ccc; font-size: 23px; cursor: pointer; }
+.star-rating-select .star.on { color: var(--color-gold-star); }
+.submit-btn { width: 100%; margin-top: 4px; padding: 12px; }
+.edit-actions, .confirm-actions { display: flex; gap: 10px; margin-top: 18px; }
+.edit-actions > button, .confirm-actions > button { flex: 1; }
+.confirm-box > p { color: #666; font-size: 14px; }
+.confirm-box .delete-warning { color: #a3293d; }
+.form-error { margin: 0 0 10px; color: #a3293d; font-size: 12px; }
+.loading-overlay { position: fixed; inset: 0; z-index: 1200; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; background: rgb(255 246 236 / 82%); color: #654a37; font: 14px InstrumentSans_Semi, sans-serif; }
+.loading-overlay ion-spinner { width: 38px; height: 38px; --color: #6f4e37; }
 
-/* Grid + cards */
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.no-reviews {
-  grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;
-  font-family: InstrumentSans, sans-serif;
+@media (max-width: 760px) {
+  .page-header { padding-top: 26px; }
+  .page-header h1 { font-size: 23px; }
+  .product-overview-card { align-items: flex-start; flex-direction: column; gap: 18px; padding: 20px; }
+  .product-image-container, .product-image { width: 100%; }
+  .product-image { height: 220px; }
+  .reviews-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.review-card {
-  background: var(--color-card-bg); border-radius: 12px; overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, .05); display: flex; flex-direction: column;
-}
-.review-card-img { width: 100%; height: 180px; object-fit: cover; }
-.review-card-body { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
-.reviewer-name { font-size: 13px; color: #333; margin: 0; }
-.review-rating {
-  font-size: 12px; color: #444; margin: 0;
-  .stars { color: var(--color-gold-star); font-size: 13px; }
-  .rating-num { color: var(--color-gold-star); font-weight: 600; }
-}
-.review-title { font-family: InstrumentSans_Semi, sans-serif; font-size: 14px; color: #2D2D2D; margin: 4px 0 0; }
-.review-comment { font-size: 12px; color: #555; line-height: 1.4; margin: 0; }
-.review-date { font-size: 11px; color: #999; margin-top: 6px; }
-
-/* Modal (ion-modal as a centered auto-height dialog) */
-ion-modal.review-modal {
-  --width: 440px;
-  --max-width: 92%;
-  --height: fit-content;
-  --border-radius: 12px;
-  --box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
-  --backdrop-opacity: .5;
-}
-.modal-box { background: #FFF; padding: 24px; width: 100%; font-family: InstrumentSans, sans-serif; }
-.modal-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;
-  h3 { font-family: Merriweather_Semi, serif; font-size: 18px; margin: 0; }
-}
-.close-modal { background: none; border: none; font-size: 20px; cursor: pointer; }
-
-.form-field-group {
-  display: flex; flex-direction: column; margin-bottom: 16px;
-  label { font-family: InstrumentSans_Semi, sans-serif; font-size: 12px; color: #555; margin-bottom: 6px; }
-}
-.radius-10-input, .custom-input-box {
-  width: 100%; background: #F5F5F5; border: 1px solid var(--color-border-gray);
-  border-radius: 8px; padding: 10px 14px; font-family: InstrumentSans, sans-serif; font-size: 13px;
-  outline: none; box-shadow: 0 3px 6px rgba(0, 0, 0, .05); transition: all .2s;
-  &:focus { background: #FFF; border-color: var(--color-primary); box-shadow: 0 4px 10px rgba(0, 0, 0, .1); }
-}
-.custom-input-box { resize: vertical; }
-
-.submit-btn {
-  width: 100%; background: var(--color-primary); color: #FFF; border: none; padding: 12px;
-  border-radius: 8px; margin-top: 10px;
-  font-family: InstrumentSans_Semi, sans-serif; font-size: 14px; cursor: pointer; transition: background-color .2s;
-  &:hover:not(:disabled) { background: #563C2A; }
-  &:disabled { opacity: .6; cursor: not-allowed; }
-}
-
-.star-rating-select {
-  display: flex; gap: 6px; font-size: 24px; cursor: pointer; user-select: none;
-  .star { color: #CCC; transition: color .15s ease; &.on { color: var(--color-gold-star); } }
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .reviews-grid { grid-template-columns: repeat(2, 1fr); }
-  .product-overview-card { flex-direction: column; align-items: flex-start; }
-  .product-image { width: 100%; height: 200px; }
-}
-@media (max-width: 600px) {
+@media (max-width: 520px) {
   .reviews-grid { grid-template-columns: 1fr; }
+  .your-review-card { padding: 20px; }
+  .your-review-text { margin: 18px 0 24px; }
+  .edit-actions, .confirm-actions { flex-wrap: wrap; }
+  .edit-actions > button, .confirm-actions > button { min-width: 42%; }
 }

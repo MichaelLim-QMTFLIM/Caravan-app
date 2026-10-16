@@ -4,99 +4,143 @@
   </header>
 
   <main class="reviews-container">
-    <!-- Hero Product Overview Card -->
-    <section class="product-overview-card">
-      <div class="product-image-container">
-        <img src="assets/Images/paprika.jpg" alt="Paprika Spice" class="product-image" />
-      </div>
-      <div class="product-details">
-        <h2>Product Overview</h2>
-        <p class="origin-text"><strong>Paprika</strong> - Origin: Central and South America</p>
-        <p class="description-text">
-          A vibrant spice known for its rich color and deep, smoky flavor. Perfect for enhancing soups, stews, and roasted dishes.
-        </p>
-        <div class="hero-stars" aria-hidden="true">
-          @for (s of starValues; track s) { <span>★</span> }
+    @if (error && !modalOpen && !deleteConfirmOpen) {
+      <p class="page-error" role="alert">{{ error }}</p>
+    }
+
+    @if (product) {
+      <section class="product-overview-card">
+        <div class="product-image-container">
+          <img [src]="imageUrl(product.product_image)" [alt]="product.product_name" class="product-image" (error)="imageFailed($event)" />
         </div>
-        <div class="score-text">4.8 Out of 5 Stars</div>
-        <div class="review-count">based on 32 reviews</div>
-        <button class="leave-review-btn" type="button" (click)="openModal()">Leave a Review</button>
-      </div>
-    </section>
+        <div class="product-details">
+          <h2>Product Overview</h2>
+          <p class="origin-text"><strong>{{ product.product_name }}</strong> - Origin: {{ product.product_country || 'Not specified' }}</p>
+          <p class="description-text">{{ product.product_desc || 'No description is available for this item.' }}</p>
+          <div class="hero-stars" [attr.aria-label]="summary.average_rating + ' out of 5 stars'">{{ starsForAverage() }}</div>
+          <div class="score-text">{{ summary.average_rating | number:'1.0-1' }} Out of 5 Stars</div>
+          <div class="review-count">Based on {{ summary.review_count }} {{ summary.review_count === 1 ? 'review' : 'reviews' }}</div>
+          @if (!myReview) {
+            <button class="leave-review-btn" type="button" (click)="openModal()">Leave a Review</button>
+          }
+        </div>
+      </section>
 
-    <!-- Carousel Controls -->
-    <div class="carousel-controls">
-      <button class="control-btn" type="button" aria-label="Previous Page"
-              [style.opacity]="canGoPrev ? 1 : 0.5" (click)="prev()">&lt;</button>
-      <button class="control-btn" type="button" aria-label="Next Page"
-              [style.opacity]="canGoNext ? 1 : 0.5" (click)="next()">&gt;</button>
-    </div>
-
-    <!-- Reviews Grid -->
-    <section class="reviews-grid">
-      @if (reviews.length === 0) {
-        <div class="no-reviews">No reviews yet. Be the first to leave a review!</div>
-      }
-
-      @for (r of pagedReviews; track $index) {
-        <article class="review-card">
-          <img src="assets/Images/paprika.jpg" alt="Paprika" class="review-card-img" />
-          <div class="review-card-body">
-            <p class="reviewer-name">User: {{ r.name }}</p>
-            <div class="review-rating">
-              Rating: <span class="stars">{{ starString(r.rating) }}</span>
-              <span class="rating-num">[{{ r.rating }} stars]</span>
-            </div>
-            <h3 class="review-title">Title: {{ r.title }}</h3>
-            <p class="review-comment">Comment: {{ r.comment }}</p>
-            <p class="review-date">Date: {{ r.date }}</p>
+      @if (myReview) {
+        <section class="your-review-card">
+          <div class="your-review-heading">
+            <h2>Your Review</h2>
+            <button class="edit-review-btn" type="button" (click)="openModal(true)">Edit Review</button>
           </div>
-        </article>
+          <div class="your-rating">
+            <span class="stars">{{ starString(myReview.rating) }}</span>
+            <span>{{ myReview.rating }} {{ myReview.rating === 1 ? 'Star' : 'Stars' }}</span>
+          </div>
+          <h3>{{ myReview.review_title }}</h3>
+          <p class="your-review-text">{{ myReview.review_text }}</p>
+          <time class="review-date">{{ formatDate(myReview.review_date) }}</time>
+        </section>
       }
-    </section>
+
+      @if (reviews.length > cardsPerPage) {
+        <nav class="pagination" aria-label="Review pages">
+          <button class="control-btn" type="button" aria-label="Previous page" [disabled]="!canGoPrev" (click)="prev()">&lt;</button>
+          <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+          <button class="control-btn" type="button" aria-label="Next page" [disabled]="!canGoNext" (click)="next()">&gt;</button>
+        </nav>
+      }
+
+      <section class="reviews-grid" aria-label="Customer reviews">
+        @if (reviews.length === 0) {
+          <div class="no-reviews">No reviews yet. Be the first to leave a review!</div>
+        }
+        @for (review of pagedReviews; track review.review_id) {
+          <article class="review-card">
+            <div class="review-card-body">
+              <p class="reviewer-name">{{ reviewerName(review) }}</p>
+              <div class="review-rating">
+                <span class="stars">{{ starString(review.rating) }}</span>
+                <span>{{ review.rating }} {{ review.rating === 1 ? 'star' : 'stars' }}</span>
+              </div>
+              <h3 class="review-title">{{ review.review_title }}</h3>
+              <p class="review-comment">{{ review.review_text }}</p>
+              <time class="review-date">{{ formatDate(review.review_date) }}</time>
+            </div>
+          </article>
+        }
+      </section>
+
+      @if (reviews.length > cardsPerPage) {
+        <nav class="pagination pagination-bottom" aria-label="Review pages">
+          <button class="control-btn" type="button" aria-label="Previous page" [disabled]="!canGoPrev" (click)="prev()">&lt;</button>
+          <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+          <button class="control-btn" type="button" aria-label="Next page" [disabled]="!canGoNext" (click)="next()">&gt;</button>
+        </nav>
+      }
+    }
   </main>
 
-  <!-- Review Modal -->
-  <ion-modal class="review-modal" [isOpen]="modalOpen" (didDismiss)="closeModal()">
-    <ng-template>
-      <div class="modal-box">
+  @if (modalOpen) {
+    <div class="dialog-backdrop" role="presentation" (click)="closeModal()">
+      <section class="dialog-box" role="dialog" aria-modal="true" [attr.aria-label]="editMode ? 'Edit review' : 'Leave a review'" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h3>Leave a Review</h3>
+          <h2>{{ editMode ? 'Edit Review' : 'Leave a Review' }}</h2>
           <button class="close-modal" type="button" aria-label="Close" (click)="closeModal()">&times;</button>
         </div>
-
         <form #reviewForm="ngForm" (ngSubmit)="submit(reviewForm)">
-          <div class="form-field-group">
-            <label for="reviewerName">Your Name</label>
-            <input id="reviewerName" name="name" type="text" class="radius-10-input"
-                   placeholder="e.g. SpiceLover" [(ngModel)]="form.name" required />
-          </div>
-
           <div class="form-field-group">
             <label>Rating</label>
             <div class="star-rating-select" (mouseleave)="hoverRating = 0">
-              @for (s of starValues; track s) {
-                <span class="star" [class.on]="s <= shownRating"
-                      (mouseenter)="hoverRating = s" (click)="rating = s">★</span>
+              @for (star of starValues; track star) {
+                <button class="star" [class.on]="star <= shownRating" type="button" [attr.aria-label]="star + ' stars'" (mouseenter)="hoverRating = star" (focus)="hoverRating = star" (blur)="hoverRating = 0" (click)="rating = star">★</button>
               }
             </div>
           </div>
-
           <div class="form-field-group">
             <label for="reviewTitle">Review Title</label>
-            <input id="reviewTitle" name="title" type="text" class="radius-10-input"
-                   placeholder="e.g. Amazing quality!" [(ngModel)]="form.title" required />
+            <input id="reviewTitle" name="title" type="text" class="radius-10-input" maxlength="150" placeholder="e.g. Amazing quality!" [(ngModel)]="form.title" required />
           </div>
-
           <div class="form-field-group">
-            <label for="reviewComment">Comment</label>
-            <textarea id="reviewComment" name="comment" class="custom-input-box" rows="4"
-                      placeholder="Share your experience..." [(ngModel)]="form.comment" required></textarea>
+            <label for="reviewComment">{{ editMode ? 'Review Text' : 'Comment' }}</label>
+            <textarea id="reviewComment" name="comment" class="custom-input-box" rows="4" maxlength="2000" placeholder="Share your experience..." [(ngModel)]="form.comment" required></textarea>
           </div>
-
-          <button type="submit" class="submit-btn" [disabled]="reviewForm.invalid">Submit Review</button>
+          @if (error) { <p class="form-error" role="alert">{{ error }}</p> }
+          @if (editMode) {
+            <div class="edit-actions">
+              <button type="submit" class="save-btn" [disabled]="reviewForm.invalid || saving">{{ saving ? 'Saving...' : 'Save' }}</button>
+              <button type="button" class="cancel-btn" [disabled]="saving" (click)="closeModal()">Cancel</button>
+              <button type="button" class="delete-btn" [disabled]="saving" (click)="deleteConfirmOpen = true">Delete</button>
+            </div>
+          } @else {
+            <button type="submit" class="submit-btn" [disabled]="reviewForm.invalid || saving">{{ saving ? 'Submitting...' : 'Submit Review' }}</button>
+          }
         </form>
-      </div>
-    </ng-template>
-  </ion-modal>
+      </section>
+    </div>
+  }
+
+  @if (deleteConfirmOpen) {
+    <div class="dialog-backdrop confirm-backdrop" role="presentation">
+      <section class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="deleteTitle">
+        <div class="modal-header">
+          <h2 id="deleteTitle">Delete Review</h2>
+          <button class="close-modal" type="button" aria-label="Close" (click)="deleteConfirmOpen = false">&times;</button>
+        </div>
+        <p>Are you sure you want to delete this review?</p>
+        <p class="delete-warning">This action cannot be undone.</p>
+        @if (error) { <p class="form-error" role="alert">{{ error }}</p> }
+        <div class="confirm-actions">
+          <button type="button" class="delete-btn" [disabled]="saving" (click)="deleteReview()">{{ saving ? 'Deleting...' : 'Confirm Delete' }}</button>
+          <button type="button" class="cancel-btn" [disabled]="saving" (click)="deleteConfirmOpen = false">Cancel</button>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="loading-overlay" role="status" aria-live="polite">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Loading reviews...</span>
+    </div>
+  }
 </ion-content>
