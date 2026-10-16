@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   // Android Studio emulator host alias. For a physical device, use the
   // development computer's LAN IP or switch to localhost with `adb reverse`.
-  androidApiBaseUrl: 'http://localhost:3000',
+  androidApiBaseUrl: 'http://10.0.2.2:3000',
 };
 
 /*
