@@ -6,8 +6,12 @@ const config: CapacitorConfig = {
   webDir: 'www',
   // Keep Android and the local backend on the same scheme/site for cookie auth.
   server: {
-    androidScheme: 'http',
+    androidScheme: 'https',
+    cleartext: true
   },
+  plugins: {
+    CapacitorHttp: { enabled: true }
+  }
 };
 
 export default config;
