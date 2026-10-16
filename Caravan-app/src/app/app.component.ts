@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from './services/auth.service';
+import { SettingsService } from './services/settings.service';
 import { ConnectivityNoticeComponent } from './components/connectivity-notice.component';
 import {
   IonApp,
@@ -61,6 +62,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     readonly auth: AuthService,
     private readonly router: Router,
+    readonly settings: SettingsService,
   ) {}
 
   readonly showNavigation = signal(true);
@@ -69,6 +71,7 @@ export class AppComponent implements OnInit, OnDestroy {
     { label: 'Market', path: '/store', icon: 'storefront-outline' },
     { label: 'Cart', path: '/cart', icon: 'cart-outline' },
     { label: 'Order history', path: '/orderhistory', icon: 'receipt-outline' },
+    { label: 'Settings', path: '/settings', icon: 'settings-outline' },
     { label: 'FAQs', path: '/faqs', icon: 'help-circle-outline' },
     { label: 'About Caravan', path: '/about', icon: 'information-circle-outline' },
   ];

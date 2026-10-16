@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { IonContent, IonSpinner } from '@ionic/angular';
+import { SettingsService } from '../../services/settings.service';
 
 interface Order {
   orderId: number;
@@ -67,6 +68,7 @@ export class OrderhistoryPage implements OnInit {
   constructor(
     private readonly http: HttpClient,
     private readonly changeDetector: ChangeDetectorRef,
+    readonly settings: SettingsService,
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +79,10 @@ export class OrderhistoryPage implements OnInit {
     const filtered = this.filteredAndSortedOrders;
     const start = (this.currentPage - 1) * this.pageSize;
     return filtered.slice(start, start + this.pageSize);
+  }
+
+  formatCurrency(value: number): string {
+    return this.settings.formatCurrency(value);
   }
 
   get filteredAndSortedOrders(): Order[] {

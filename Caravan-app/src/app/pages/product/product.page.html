@@ -33,7 +33,7 @@
             </select>
           </div>
 
-          <div class="product-price">Price: ₱{{ price }}</div>
+          <div class="product-price">Price: {{ price }}</div>
 
           <button class="review-btn" type="button" (click)="goToReviews()">★ Go to Reviews</button>
 
@@ -62,7 +62,7 @@
                 <div class="cardImg"><img [src]="p.product_image" [alt]="p.product_name" /></div>
                 <div class="card-details">
                   <h4 class="card-title">{{ p.product_name }}</h4>
-                  <p class="art-price">₱{{ (+p.product_price || 0).toFixed(2) }}</p>
+                  <p class="art-price">{{ formatCurrency(+p.product_price || 0) }}</p>
                 </div>
               </button>
             }
@@ -79,7 +79,7 @@
                 <div class="cardImg"><img [src]="p.product_image" [alt]="p.product_name" /></div>
                 <div class="card-details">
                   <h4 class="card-title">{{ p.product_name }}</h4>
-                  <p class="art-price">₱{{ (+p.product_price || 0).toFixed(2) }}</p>
+                  <p class="art-price">{{ formatCurrency(+p.product_price || 0) }}</p>
                 </div>
               </button>
             }

@@ -32,9 +32,8 @@
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* The Settings page controls dark mode with the ion-palette-dark class. */
+@import '@ionic/angular/css/palettes/dark.class.css';
 
 
 :root {
@@ -43,6 +42,147 @@
   --color-green-card: #4F7658;
   --color-image-bg: #EAE3D9;
   --color-text-light: #333333;
+  --app-background: #faf4ed;
+  --app-surface: #ffffff;
+  --app-input: #ffffff;
+  --app-text: #34271f;
+  --app-muted: #71665d;
+  --app-border: #e5ddd5;
+  color-scheme: light;
+}
+
+:root.ion-palette-dark {
+  --color-secondary: #191715;
+  --color-text-light: #f3eee8;
+  --app-background: #191715;
+  --app-surface: #262320;
+  --app-input: #302c28;
+  --app-text: #f3eee8;
+  --app-muted: #c0b5aa;
+  --app-border: #4b433c;
+  --ion-background-color: #191715;
+  --ion-text-color: #f3eee8;
+  color-scheme: dark;
+}
+
+html.ion-palette-dark body,
+html.ion-palette-dark ion-app,
+html.ion-palette-dark .ion-page {
+  background: var(--app-background);
+  color: var(--app-text);
+}
+
+html.ion-palette-dark ion-content {
+  --background: var(--app-background) !important;
+  --color: var(--app-text);
+}
+
+html.ion-palette-dark ion-toolbar {
+  --background: #24211e;
+  --color: var(--app-text);
+}
+
+html.ion-palette-dark .app-sidebar {
+  --background: #211e1b;
+  --ion-background-color: #211e1b;
+  --caravan-ink: #f3eee8;
+}
+
+html.ion-palette-dark .app-header ion-menu-button,
+html.ion-palette-dark .app-header ion-button,
+html.ion-palette-dark .toolbar-brand,
+html.ion-palette-dark .app-sidebar ion-item {
+  color: #f3eee8;
+}
+
+html.ion-palette-dark app-settings {
+  --app-background: #191715;
+  --app-surface: #262320;
+  --app-input: #302c28;
+  --app-text: #f3eee8;
+  --app-muted: #c0b5aa;
+  --app-border: #4b433c;
+}
+
+html.ion-palette-dark app-cart {
+  --caravan-cream: #191715;
+  --caravan-dark-brown: #e6d5c6;
+  --field-background: #302c28;
+  --border-colour: #4b433c;
+  --text-colour: #f3eee8;
+}
+
+html.ion-palette-dark app-cart .cart-section,
+html.ion-palette-dark app-cart .checkout-section,
+html.ion-palette-dark app-cart .modal-box,
+html.ion-palette-dark app-cart .empty-cart {
+  border-color: var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+html.ion-palette-dark app-cart .cart-item { border-color: var(--app-border); background: #302c28; }
+html.ion-palette-dark app-cart .product-information h3,
+html.ion-palette-dark app-cart .page-header h1,
+html.ion-palette-dark app-cart .empty-cart h3 { color: var(--app-text); }
+html.ion-palette-dark app-cart select { border-color: var(--app-border); background: var(--app-input); color: var(--app-text); }
+
+html.ion-palette-dark app-store {
+  --color-secondary: #191715;
+  --text-color: #f3eee8;
+}
+
+html.ion-palette-dark app-store .function-bar,
+html.ion-palette-dark app-store .category-sidebar { border-color: var(--app-border); background: #211e1b; }
+html.ion-palette-dark app-store .searchbar,
+html.ion-palette-dark app-store .filter-control select,
+html.ion-palette-dark app-store .price-filter input { border-color: var(--app-border); background: #302c28; color: var(--app-text); }
+html.ion-palette-dark app-store .price-filter legend,
+html.ion-palette-dark app-store .price-filter label,
+html.ion-palette-dark app-store .category-sidebar h2,
+html.ion-palette-dark app-store .category-option,
+html.ion-palette-dark app-store .section-title { color: var(--app-text); }
+html.ion-palette-dark app-store .category-option:hover,
+html.ion-palette-dark app-store .category-option.active { background: #41382f; color: #f3eee8; }
+
+html.ion-palette-dark app-profile {
+  --caravan-cream: #211e1b;
+  --card-background: #302c28;
+  --field-background: #302c28;
+  --border-colour: #4b433c;
+  --text-colour: #f3eee8;
+}
+html.ion-palette-dark app-profile .profile-wrapper,
+html.ion-palette-dark app-profile .profile-card,
+html.ion-palette-dark app-profile .address-card,
+html.ion-palette-dark app-profile .wishlist-card,
+html.ion-palette-dark app-profile .voucher-card { background: var(--app-surface); color: var(--app-text); }
+
+html.ion-palette-dark app-orderhistory {
+  --caravan-cream: #191715;
+  --text-color: #f3eee8;
+  --muted-color: #c0b5aa;
+}
+html.ion-palette-dark app-orderhistory .orders-list,
+html.ion-palette-dark app-orderhistory .order-card,
+html.ion-palette-dark app-orderhistory .receipt-modal { border-color: var(--app-border); background: var(--app-surface); color: var(--app-text); }
+
+html.ion-palette-dark app-product {
+  --color-secondary: #191715;
+  --color-image-bg: #302c28;
+}
+html.ion-palette-dark app-product .recommendations-section,
+html.ion-palette-dark app-product .recommendation-card,
+html.ion-palette-dark app-product .product-action-modal { border-color: var(--app-border); background: var(--app-surface); color: var(--app-text); }
+html.ion-palette-dark app-product .recommendations-section h2 { color: var(--app-text); }
+
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }
 
 @font-face {

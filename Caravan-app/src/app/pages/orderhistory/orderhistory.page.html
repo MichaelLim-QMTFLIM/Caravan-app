@@ -24,10 +24,10 @@
         <span>Filter Price:</span>
         <select [(ngModel)]="priceFilter" (ngModelChange)="filtersChanged()">
           <option value="all">All</option>
-          <option value="0-500">₱0 - ₱500</option>
-          <option value="501-1000">₱501 - ₱1,000</option>
-          <option value="1001-5000">₱1,001 - ₱5,000</option>
-          <option value="5001+">₱5,001+</option>
+          <option value="0-500">{{ formatCurrency(0) }} - {{ formatCurrency(500) }}</option>
+          <option value="501-1000">{{ formatCurrency(501) }} - {{ formatCurrency(1000) }}</option>
+          <option value="1001-5000">{{ formatCurrency(1001) }} - {{ formatCurrency(5000) }}</option>
+          <option value="5001+">{{ formatCurrency(5001) }}+</option>
         </select>
       </label>
     </div>
@@ -49,7 +49,7 @@
             <div class="order-card-body">
               <div class="order-summary">
                 <p>Status: <strong class="status-text" [class]="'status-text ' + statusClass(order.status)">[{{ order.status }}]</strong></p>
-                <p>Order Total: <strong>₱{{ order.total | number:'1.2-2' }}</strong></p>
+                <p>Order Total: <strong>{{ formatCurrency(order.total) }}</strong></p>
               </div>
               <button type="button" class="track-order-btn" (click)="openReceipt(order)">
                 Track Order
@@ -106,7 +106,7 @@
                     <strong>{{ item.name }}</strong>
                     @if (formatSize(item.size)) { <span>Size: {{ formatSize(item.size) }}</span> }
                     <span>Quantity: {{ item.quantity }}</span>
-                    <span>Unit Price: ₱{{ item.unitPrice | number:'1.2-2' }}</span>
+                    <span>Unit Price: {{ formatCurrency(item.unitPrice) }}</span>
                   </div>
                 </article>
               }
@@ -114,14 +114,14 @@
 
             <dl class="receipt-totals">
               <div><dt>Shipping</dt><dd>{{ receipt.shippingName || 'Shipping' }}</dd></div>
-              <div><dt>Shipping Fee</dt><dd>₱{{ receipt.shippingFee | number:'1.2-2' }}</dd></div>
-              <div><dt>Discount</dt><dd>-₱{{ receipt.discount | number:'1.2-2' }}</dd></div>
+              <div><dt>Shipping Fee</dt><dd>{{ formatCurrency(receipt.shippingFee) }}</dd></div>
+              <div><dt>Discount</dt><dd>-{{ formatCurrency(receipt.discount) }}</dd></div>
               <div class="receipt-address"><dt>Address</dt><dd>{{ receipt.address || 'Address unavailable' }}</dd></div>
             </dl>
 
             <div class="receipt-grand-total">
               <span>Grand Total</span>
-              <strong>₱{{ receipt.total | number:'1.2-2' }}</strong>
+              <strong>{{ formatCurrency(receipt.total) }}</strong>
             </div>
           } @else {
             <p class="state-message error-message">Unable to load this order receipt.</p>

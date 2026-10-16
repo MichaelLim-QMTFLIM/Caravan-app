@@ -21,6 +21,7 @@ import {
   personOutline,
   receiptOutline,
   remove,
+  settingsOutline,
   storefrontOutline,
   trashOutline,
 } from 'ionicons/icons';
@@ -47,6 +48,7 @@ addIcons({
   personOutline,
   receiptOutline,
   remove,
+  settingsOutline,
   storefrontOutline,
   trashOutline,
 });

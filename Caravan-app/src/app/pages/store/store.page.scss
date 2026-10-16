@@ -109,7 +109,7 @@ ion-content { --background: var(--color-secondary); color: var(--text-color); }
 
 .product-section {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+  grid-template-columns: repeat(var(--market-grid-columns, 3), minmax(0, 1fr));
   gap: 24px;
   padding: 22px 4px;
 }
@@ -160,7 +160,7 @@ ion-content { --background: var(--color-secondary); color: var(--text-color); }
   .function-bar { flex-wrap: wrap; justify-content: flex-start; }
   .search-field { max-width: none; }
   .browse-layout { grid-template-columns: 180px minmax(0, 1fr); }
-  .product-section { grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 14px; }
+  .product-section { grid-template-columns: repeat(var(--market-grid-columns, 3), minmax(0, 1fr)); gap: 14px; }
   .product-card { min-height: 300px; }
   .product-image { height: 145px; }
 }
@@ -179,7 +179,7 @@ ion-content { --background: var(--color-secondary); color: var(--text-color); }
   .store-content { padding: 12px; }
   .tabs-container { margin-bottom: 12px; }
   .tab-button { min-width: 0; flex: 1; }
-  .product-section { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 14px 0; }
+  .product-section { grid-template-columns: repeat(var(--market-grid-columns, 3), minmax(0, 1fr)); gap: 10px; padding: 14px 0; }
   .product-card { min-height: 250px; padding: 7px; }
   .product-image { height: 120px; margin-bottom: 7px; }
   .product-name { font-size: 16px; }

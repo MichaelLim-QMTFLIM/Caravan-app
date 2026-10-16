@@ -5,6 +5,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonSpinner } from '@ionic/angular';
 import { firstValueFrom, timeout } from 'rxjs';
+import { SettingsService } from '../../services/settings.service';
 
 interface Category { category_id: number; }
 
@@ -56,6 +57,7 @@ export class ProductPage implements OnInit {
     private router: Router,
     private http: HttpClient,
     private changeDetector: ChangeDetectorRef,
+    private readonly settings: SettingsService,
   ) {}
 
   ngOnInit() {
@@ -71,7 +73,11 @@ export class ProductPage implements OnInit {
 
   get price(): string {
     const ounces = this.size === '8oz' ? 8 : 16;
-    return ((Number(this.item?.product_price) || 0) * ounces).toFixed(2);
+    return this.settings.formatCurrency((Number(this.item?.product_price) || 0) * ounces);
+  }
+
+  formatCurrency(value: number): string {
+    return this.settings.formatCurrency(value);
   }
 
   private async load() {
@@ -176,7 +182,7 @@ export class ProductPage implements OnInit {
       return;
     }
     this.actionModalTitle = 'Add to Cart?';
-    this.actionModalMessage = `Add ${this.item?.product_name ?? 'this item'} (${this.size}) to your cart for ₱${this.price}?`;
+    this.actionModalMessage = `Add ${this.item?.product_name ?? 'this item'} (${this.size}) to your cart for ${this.price}?`;
     this.actionModalMode = 'confirm-cart';
     this.changeDetector.detectChanges();
   }

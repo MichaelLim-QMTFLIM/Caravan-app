@@ -1,0 +1,78 @@
+<ion-content>
+  <main class="settings-page">
+    <header class="settings-heading">
+      <p class="settings-eyebrow">Your app</p>
+      <h1>Settings</h1>
+      <p>Personalize how Caravan looks and feels.</p>
+    </header>
+
+    <section class="settings-card" aria-labelledby="appearance-title">
+      <div class="settings-card-heading">
+        <span class="settings-icon" aria-hidden="true">◐</span>
+        <div>
+          <h2 id="appearance-title">Appearance</h2>
+          <p>Choose the color theme used throughout Caravan.</p>
+        </div>
+      </div>
+      <label class="setting-control" for="theme-choice">
+        <span>Theme</span>
+        <select id="theme-choice" [ngModel]="settings.theme()" (ngModelChange)="setTheme($event)">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="settings-card" aria-labelledby="currency-title">
+      <div class="settings-card-heading">
+        <span class="settings-icon" aria-hidden="true">₱</span>
+        <div>
+          <h2 id="currency-title">Currency display</h2>
+          <p>Choose how Philippine peso prices are labeled.</p>
+        </div>
+      </div>
+      <label class="setting-control" for="currency-choice">
+        <span>Price style</span>
+        <select id="currency-choice" [ngModel]="settings.pesoStyle()" (ngModelChange)="settings.setPesoStyle($event)">
+          @for (style of currencyStyles; track style) {
+            <option [value]="style">{{ style }} · Example {{ style }} 1,250.00</option>
+          }
+        </select>
+      </label>
+      <p class="settings-preview">Preview: <strong>{{ settings.formatCurrency(1250) }}</strong></p>
+    </section>
+
+    <section class="settings-card" aria-labelledby="market-title">
+      <div class="settings-card-heading">
+        <span class="settings-icon" aria-hidden="true">▦</span>
+        <div>
+          <h2 id="market-title">Market layout</h2>
+          <p>Set how many product or bundle cards appear in each row.</p>
+        </div>
+      </div>
+      <label class="setting-control" for="market-columns">
+        <span>Cards per row</span>
+        <select id="market-columns" [ngModel]="settings.marketColumns()" (ngModelChange)="settings.setMarketColumns($event)">
+          <option [ngValue]="2">2 cards</option>
+          <option [ngValue]="3">3 cards</option>
+          <option [ngValue]="4">4 cards</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="settings-card accessibility-card" aria-labelledby="accessibility-title">
+      <div>
+        <h2 id="accessibility-title">Accessibility</h2>
+        <p>Reduce animations and transitions across the app.</p>
+      </div>
+      <label class="switch-control">
+        <span>Reduce motion</span>
+        <input
+          type="checkbox"
+          [ngModel]="settings.reduceMotion()"
+          (ngModelChange)="settings.setReduceMotion($event)"
+          aria-label="Reduce motion">
+      </label>
+    </section>
+  </main>
+</ion-content>

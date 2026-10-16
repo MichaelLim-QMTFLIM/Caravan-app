@@ -71,13 +71,13 @@
             </div>
           </div>
         } @else {
-          <section class="product-section" [attr.aria-label]="currentTab">
+          <section class="product-section" [attr.aria-label]="currentTab" [style.--market-grid-columns]="settings.marketColumns()">
             @for (item of visibleItems; track item.product_id) {
               <button type="button" class="product-card" (click)="openItem(item)" [attr.aria-label]="'View ' + item.product_name">
                 <img class="product-image" [src]="item.product_image || 'assets/Images/ItemNotFound_nobg.png'" [alt]="item.product_name" (error)="imageFailed($event)">
                 <div class="product-info">
                   <h3 class="product-name">{{ item.product_name }}</h3>
-                  <p class="product-price">₱{{ (+item.product_price || 0) | number:'1.2-2' }}/oz.</p>
+                  <p class="product-price">{{ formatCurrency(+item.product_price || 0) }}/oz.</p>
                   <div class="product-rating" [attr.aria-label]="ratingLabel(item)">
                     <span class="rating-stars">{{ starString(item) }}</span>
                     <span class="rating-label">{{ ratingLabel(item) }}</span>

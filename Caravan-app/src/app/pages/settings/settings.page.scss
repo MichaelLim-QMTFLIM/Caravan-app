@@ -1,0 +1,46 @@
+:host { display: block; }
+
+ion-content { --background: var(--app-background, #faf4ed); }
+
+.settings-page {
+  width: min(100% - 32px, 900px);
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 30px 0 48px;
+  color: var(--app-text, #34271f);
+}
+
+.settings-heading { margin: 0 0 22px; }
+.settings-eyebrow { margin: 0 0 5px; color: #8b684d; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.settings-heading h1 { margin: 0; color: inherit; font: 500 clamp(30px, 5vw, 40px)/1.2 Georgia, serif; }
+.settings-heading > p:last-child { margin: 8px 0 0; color: var(--app-muted, #71665d); }
+
+.settings-card {
+  margin: 14px 0;
+  padding: 22px;
+  border: 1px solid var(--app-border, #e8e0d8);
+  border-radius: 16px;
+  background: var(--app-surface, #fff);
+  box-shadow: 0 4px 16px #4c342012;
+}
+
+.settings-card-heading { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+.settings-icon { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: #f4e8dc; color: #6f4e37; font-size: 22px; font-weight: 700; }
+.settings-card h2 { margin: 0; color: inherit; font-size: 18px; }
+.settings-card p { margin: 5px 0 0; color: var(--app-muted, #71665d); font-size: 14px; line-height: 1.5; }
+
+.setting-control { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(190px, 1.4fr); align-items: center; gap: 14px; color: inherit; font-size: 14px; font-weight: 600; }
+.setting-control select { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--app-border, #d6cdc5); border-radius: 9px; background: var(--app-input, #fff); color: var(--app-text, #34271f); font: inherit; }
+.settings-preview { margin-left: calc(50% + 7px) !important; }
+
+.accessibility-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.switch-control { display: inline-flex; align-items: center; gap: 12px; color: inherit; font-size: 14px; font-weight: 600; }
+.switch-control input { width: 20px; height: 20px; accent-color: #6f4e37; }
+
+@media (max-width: 560px) {
+  .settings-page { width: min(100% - 24px, 900px); padding-top: 22px; }
+  .settings-card { padding: 18px; }
+  .setting-control { grid-template-columns: 1fr; gap: 8px; }
+  .settings-preview { margin-left: 0 !important; }
+  .accessibility-card { align-items: flex-start; flex-direction: column; }
+}

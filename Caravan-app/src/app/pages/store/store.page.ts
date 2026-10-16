@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { IonContent, IonSpinner } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
+import { SettingsService } from '../../services/settings.service';
 
 interface ProductCategory { category_name: string; }
 
@@ -48,6 +49,7 @@ export class StorePage implements OnInit {
     private readonly http: HttpClient,
     private readonly router: Router,
     private readonly changeDetector: ChangeDetectorRef,
+    readonly settings: SettingsService,
   ) {}
 
   ngOnInit(): void { void this.loadItems(); }
@@ -140,6 +142,10 @@ export class StorePage implements OnInit {
   ratingLabel(item: StoreItem): string {
     const count = Number(item.review_count) || 0;
     return count ? `${Number(item.product_rating).toFixed(1)} (${count})` : 'No ratings';
+  }
+
+  formatCurrency(value: number): string {
+    return this.settings.formatCurrency(value);
   }
 
   imageFailed(event: Event): void {

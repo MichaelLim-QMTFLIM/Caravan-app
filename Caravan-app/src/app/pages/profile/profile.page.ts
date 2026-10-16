@@ -8,6 +8,7 @@ import { addIcons } from 'ionicons';
 import { person } from 'ionicons/icons';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { SettingsService } from '../../services/settings.service';
 
 type ProfileTab = 'overview' | 'addresses' | 'vouchers' | 'wishlist' | 'logout';
 
@@ -83,6 +84,7 @@ export class ProfilePage implements OnInit {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly changeDetector: ChangeDetectorRef,
+    readonly settings: SettingsService,
   ) {
     addIcons({ person });
   }
@@ -100,6 +102,10 @@ export class ProfilePage implements OnInit {
 
   get wishlistItemToDelete(): WishlistItem | undefined {
     return this.wishlistItems.find(item => item.id === this.wishlistToDeleteId);
+  }
+
+  formatCurrency(value: number): string {
+    return this.settings.formatCurrency(value);
   }
 
   get addressPageCount(): number {

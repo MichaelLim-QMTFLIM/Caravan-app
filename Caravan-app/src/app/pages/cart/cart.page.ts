@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import {
   alertCircleOutline,
 } from 'ionicons/icons';
 import { firstValueFrom, timeout } from 'rxjs';
+import { SettingsService } from '../../services/settings.service';
 
 interface CartItem {
   id: number;
@@ -75,7 +76,7 @@ type PaymentMethod = 'paypal' | 'cash' | null;
   standalone: true,
   imports: [FormsModule, IonContent, IonIcon, IonSpinner],
 })
-export class CartPage implements OnInit {
+export class CartPage {
   loading = true;
   loadingError = '';
   checkoutError = '';
@@ -98,6 +99,7 @@ export class CartPage implements OnInit {
     private readonly http: HttpClient,
     private readonly router: Router,
     private readonly changeDetector: ChangeDetectorRef,
+    private readonly settings: SettingsService,
   ) {
     addIcons({
       add,
@@ -110,7 +112,7 @@ export class CartPage implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  ionViewWillEnter(): void {
     void this.loadCart();
   }
 
@@ -336,6 +338,6 @@ export class CartPage implements OnInit {
   }
 
   formatCurrency(value: number): string {
-    return Number(value || 0).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+    return this.settings.formatCurrency(value);
   }
 }
