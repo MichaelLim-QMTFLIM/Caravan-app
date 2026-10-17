@@ -1,10 +1,12 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { IonContent, IonSpinner } from '@ionic/angular';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { firstValueFrom } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { PayPalNative } from '../../services/paypal-native.service';
 
 interface CheckoutPayload {
@@ -24,19 +26,28 @@ interface CheckoutPayload {
   templateUrl: './checkout-processing.page.html',
   styleUrls: ['./checkout-processing.page.scss'],
 })
-export class CheckoutProcessingPage implements OnInit, AfterViewInit {
+export class CheckoutProcessingPage implements OnInit, AfterViewInit, OnDestroy {
   payload: CheckoutPayload | null = null;
   processing = true;
   error = '';
   message = 'Preparing your order…';
   private viewReady = false;
   private submittingOrder = false;
+  private paypalOrderId = '';
+  private paypalReturnListener?: PluginListenerHandle;
+  private appStateListener?: PluginListenerHandle;
+  private paypalBrowserLaunched = false;
+  private paypalReturnHandled = false;
 
   get isAndroidApp(): boolean {
     return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
   }
 
-  constructor(private readonly http: HttpClient, private readonly router: Router) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly router: Router,
+    private readonly changeDetector: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     try {
@@ -63,6 +74,11 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
     if (this.payload?.paymentType === 'paypal') void this.startPaypalCheckout();
   }
 
+  ngOnDestroy(): void {
+    void this.paypalReturnListener?.remove();
+    void this.appStateListener?.remove();
+  }
+
   private async startPaypalCheckout(): Promise<void> {
     if (!this.payload || !this.viewReady || this.error) return;
     if (!this.isAndroidApp) {
@@ -71,6 +87,7 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
     }
     this.processing = true;
     this.message = 'Preparing secure PayPal checkout…';
+    this.refreshView();
     try {
       await this.startAndroidPaypalCheckout();
     } catch (error: any) {
@@ -81,36 +98,70 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
 
   private async startAndroidPaypalCheckout(): Promise<void> {
     if (!this.payload) return;
-    const config = await firstValueFrom(this.http.get<{ clientId: string; merchantId: string; environment: 'sandbox' | 'live' }>('/paypal/config'));
-    await PayPalNative.initialize({
-      clientId: config.clientId,
-      merchantId: config.merchantId,
-      environment: config.environment || 'sandbox',
+    this.message = 'Creating your secure PayPal checkout…';
+    this.refreshView();
+    this.paypalReturnListener = await App.addListener('appUrlOpen', ({ url }) => {
+      void this.handlePaypalReturn(url);
+    });
+    this.appStateListener = await App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) void this.handlePaypalAppResume();
     });
 
-    // PayPal recommends preparing its shopper session alongside server order creation.
-    const profile = await firstValueFrom(this.http.get<{ email?: string }>('/api/profile')).catch(() => null);
-    const [, order] = await Promise.all([
-      PayPalNative.createPayPalSession({ email: profile?.email }),
-      firstValueFrom(this.http.post<{ id: string }>('/paypal/create-order', {
-        totalCost: this.payload.totalCost,
-        addressId: this.payload.addressId,
-      })),
-    ]);
-    if (!order?.id) throw new Error('Unable to start PayPal payment.');
+    const order = await firstValueFrom(this.http.post<{ id: string; approvalUrl: string }>('/paypal/create-order', {
+      totalCost: this.payload.totalCost,
+      addressId: this.payload.addressId,
+    }).pipe(timeout({ first: 30000 })));
+    if (!order?.id || !order.approvalUrl) throw new Error('PayPal did not return an approval link.');
 
-    this.message = 'Approve your payment in PayPal…';
-    const approval = await PayPalNative.startCheckout({ orderId: order.id });
-    if (approval.status === 'cancelled') {
-      this.processing = false;
-      this.message = 'Payment was cancelled. Your cart is still saved.';
+    this.paypalOrderId = order.id;
+    sessionStorage.setItem('pendingPaypalOrderId', order.id);
+    this.message = 'Continue securely in Chrome to approve your payment…';
+    this.refreshView();
+    this.paypalBrowserLaunched = true;
+    await PayPalNative.openApprovalInChrome({ url: order.approvalUrl });
+  }
+
+  private async handlePaypalAppResume(): Promise<void> {
+    if (!this.paypalBrowserLaunched || this.paypalReturnHandled || this.submittingOrder || this.error) return;
+    const pendingOrderId = this.paypalOrderId || sessionStorage.getItem('pendingPaypalOrderId');
+    if (pendingOrderId) await this.completePaypalOrder(pendingOrderId);
+  }
+
+  private async handlePaypalReturn(url: string): Promise<void> {
+    let returnUrl: URL;
+    try {
+      returnUrl = new URL(url);
+    } catch {
       return;
     }
-    if (approval.status !== 'approved') {
-      throw new Error(approval.message || 'PayPal could not approve this payment.');
+    if (returnUrl.protocol !== 'caravan:' || returnUrl.hostname !== 'paypal-return') return;
+
+    const returnedOrderId = returnUrl.searchParams.get('token') || returnUrl.searchParams.get('orderID');
+    const cancelled = returnUrl.searchParams.has('cancelled') || !returnedOrderId;
+    if (cancelled) {
+      this.paypalReturnHandled = true;
+      this.processing = false;
+      this.message = 'Payment was cancelled. Your cart is still saved.';
+      sessionStorage.removeItem('pendingPaypalOrderId');
+      this.refreshView();
+      return;
     }
 
-    await this.submitOrder(approval.orderId || order.id);
+    const expectedOrderId = this.paypalOrderId || sessionStorage.getItem('pendingPaypalOrderId');
+    if (!expectedOrderId || returnedOrderId !== expectedOrderId) {
+      this.showError('The PayPal return did not match this checkout. Your cart is still saved.');
+      return;
+    }
+
+    await this.completePaypalOrder(returnedOrderId);
+  }
+
+  private async completePaypalOrder(orderId: string): Promise<void> {
+    if (this.paypalReturnHandled || this.submittingOrder) return;
+    this.paypalReturnHandled = true;
+    this.message = 'Confirming your PayPal payment…';
+    this.refreshView();
+    await this.submitOrder(orderId);
   }
 
 
@@ -122,6 +173,7 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
     this.message = this.payload.paymentType === 'cash'
       ? 'Placing your cash on delivery order…'
       : 'Confirming your PayPal payment…';
+    this.refreshView();
     try {
       const result = await firstValueFrom(this.http.post<any>('/checkout', {
         ...this.payload,
@@ -131,6 +183,7 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
 
       localStorage.removeItem('cart');
       sessionStorage.removeItem('pendingCheckout');
+      sessionStorage.removeItem('pendingPaypalOrderId');
       sessionStorage.setItem('checkoutConfirmation', JSON.stringify({
         orderId: result.orderId,
         email: result.customerEmail || '',
@@ -156,6 +209,11 @@ export class CheckoutProcessingPage implements OnInit, AfterViewInit {
   private showError(message: string): void {
     this.error = message;
     this.processing = false;
+    this.refreshView();
+  }
+
+  private refreshView(): void {
+    this.changeDetector.detectChanges();
   }
 
   returnToCart(): void {

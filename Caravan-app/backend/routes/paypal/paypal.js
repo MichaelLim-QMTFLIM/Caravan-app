@@ -136,14 +136,21 @@ router.post("/create-order", checkAuth("user"), async (req, res) => {
                     paypal: {
                         experience_context: {
                             landing_page: "LOGIN",
-                            shipping_preference: "SET_PROVIDED_ADDRESS"
+                            shipping_preference: "SET_PROVIDED_ADDRESS",
+                            return_url: "caravan://paypal-return",
+                            cancel_url: "caravan://paypal-return?cancelled=1"
                         }
                     }
                 }                
             },
             { headers: { Authorization: `Bearer ${accessToken}` } }
         );
-        return res.json({ id: response.data.id });
+        const approvalUrl = response.data.links?.find(link => link.rel === "payer-action")?.href
+            || response.data.links?.find(link => link.rel === "approve")?.href;
+        if (!approvalUrl) {
+            return res.status(502).json({ error: "PayPal did not provide an approval link" });
+        }
+        return res.json({ id: response.data.id, approvalUrl });
     } catch (error) {
         console.error("PayPal create order error:", error.response?.data || error.message);
         return res.status(502).json({ error: "Unable to create PayPal order" });

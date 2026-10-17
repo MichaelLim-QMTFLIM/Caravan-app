@@ -15,7 +15,7 @@
       <h1>{{ error ? 'Checkout needs attention' : (processing ? 'Preparing your order' : 'Checkout update') }}</h1>
       <p class="status-message">{{ error || message }}</p>
       @if (payload?.paymentType === 'paypal' && !error) {
-        <p class="security-note">PayPal will open its secure approval flow and return you here. Your order is saved after PayPal confirms payment.</p>
+        <p class="security-note">PayPal opens in Chrome for secure approval, then returns here to confirm your order.</p>
       }
 
       @if (error || (payload?.paymentType === 'paypal' && !processing)) {

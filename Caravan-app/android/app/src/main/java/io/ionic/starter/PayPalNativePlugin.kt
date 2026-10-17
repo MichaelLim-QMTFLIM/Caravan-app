@@ -1,6 +1,8 @@
 package io.ionic.starter
 
 import android.content.Intent
+import android.content.ActivityNotFoundException
+import android.net.Uri
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -22,6 +24,28 @@ class PayPalNativePlugin : Plugin() {
     private var checkoutClient: PayPalClient? = null
     private var pendingCheckoutCall: PluginCall? = null
     private var returnUrlConfig: ReturnToAppUrlConfig? = null
+
+    @PluginMethod
+    fun openApprovalInChrome(call: PluginCall) {
+        val approvalUrl = call.getString("url")?.trim().orEmpty()
+        val uri = runCatching { Uri.parse(approvalUrl) }.getOrNull()
+        if (uri == null || uri.scheme != "https" || uri.host !in setOf("www.paypal.com", "www.sandbox.paypal.com", "paypal.com", "sandbox.paypal.com")) {
+            call.reject("PayPal returned an invalid approval URL")
+            return
+        }
+
+        try {
+            val chromeIntent = Intent(Intent.ACTION_VIEW, uri).setPackage("com.android.chrome")
+            try {
+                activity.startActivity(chromeIntent)
+            } catch (_: ActivityNotFoundException) {
+                activity.startActivity(Intent(Intent.ACTION_VIEW, uri))
+            }
+            call.resolve()
+        } catch (error: Exception) {
+            call.reject("Unable to open PayPal in a browser", error)
+        }
+    }
 
     @PluginMethod
     fun initialize(call: PluginCall) {
