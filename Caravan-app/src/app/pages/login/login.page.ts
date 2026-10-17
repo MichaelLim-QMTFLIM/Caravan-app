@@ -7,6 +7,7 @@ import { IonContent } from '@ionic/angular';
 import { IonIcon } from '@ionic/angular';
 import { firstValueFrom, Subscription, take } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { SettingsService } from '../../services/settings.service';
 import { apiEndpoint } from '../../services/api-endpoint';
 
 interface LoginResponse {
@@ -37,11 +38,13 @@ export class LoginPage implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private auth: AuthService,
+    private settings: SettingsService,
   ) {}
 
   ngOnInit(): void {
     this.querySubscription = this.route.queryParamMap.pipe(take(1)).subscribe((params) => {
       if (params.get('error') === 'google_auth') {
+        this.clearPendingTeamBanner();
         this.showError('Google sign-in could not be completed. Please try again.');
       }
     });
@@ -49,6 +52,30 @@ export class LoginPage implements OnInit, OnDestroy {
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  beginGoogleLogin(): void {
+    this.queueTeamBanner();
+  }
+
+  private queueTeamBanner(): void {
+    try {
+      if (this.settings.disableBanners()) {
+        sessionStorage.removeItem('caravan.team-banner.pending');
+      } else {
+        sessionStorage.setItem('caravan.team-banner.pending', 'true');
+      }
+    } catch {
+      // The sign-in flow continues when session storage is unavailable.
+    }
+  }
+
+  private clearPendingTeamBanner(): void {
+    try {
+      sessionStorage.removeItem('caravan.team-banner.pending');
+    } catch {
+      // Ignore unavailable session storage.
+    }
   }
 
   private validateEmail(email: string): boolean {
@@ -86,6 +113,7 @@ export class LoginPage implements OnInit, OnDestroy {
 
       this.auth.isAuthenticated.set(true);
       this.auth.ready.set(true);
+      this.queueTeamBanner();
       this.router.navigateByUrl('/home');
     } catch (err: any) {
       // Non-2xx responses land here; use the server's error message if it sent one

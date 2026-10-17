@@ -9,6 +9,7 @@ interface SavedSettings {
   pesoStyle?: PesoStyle;
   marketColumns?: number;
   reduceMotion?: boolean;
+  disableBanners?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -18,6 +19,7 @@ export class SettingsService {
   readonly pesoStyle = signal<PesoStyle>('₱');
   readonly marketColumns = signal<MarketColumns>(3);
   readonly reduceMotion = signal(false);
+  readonly disableBanners = signal(false);
 
   constructor() {
     this.restore();
@@ -47,6 +49,11 @@ export class SettingsService {
     this.persist();
   }
 
+  setDisableBanners(disabled: boolean): void {
+    this.disableBanners.set(!!disabled);
+    this.persist();
+  }
+
   formatCurrency(value: number): string {
     const amount = new Intl.NumberFormat('en-PH', {
       minimumFractionDigits: 2,
@@ -65,6 +72,7 @@ export class SettingsService {
         this.marketColumns.set(Number(saved.marketColumns) as MarketColumns);
       }
       this.reduceMotion.set(!!saved.reduceMotion);
+      this.disableBanners.set(!!saved.disableBanners);
     } catch {
       // Keep the defaults when saved settings are unavailable or malformed.
     }
@@ -86,6 +94,7 @@ export class SettingsService {
         pesoStyle: this.pesoStyle(),
         marketColumns: this.marketColumns(),
         reduceMotion: this.reduceMotion(),
+        disableBanners: this.disableBanners(),
       } satisfies SavedSettings));
     } catch {
       // Settings remain active for this session if browser storage is unavailable.

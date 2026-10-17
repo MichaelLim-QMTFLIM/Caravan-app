@@ -1,0 +1,74 @@
+:host {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  display: block;
+}
+
+.banner-backdrop {
+  display: grid;
+  min-height: 100%;
+  padding: 24px;
+  place-items: center;
+  background: rgb(0 0 0 / 52%);
+}
+
+.team-banner {
+  width: min(100%, 860px);
+  padding: 28px;
+  border-radius: 20px;
+  background: var(--app-surface, #fff);
+  color: var(--app-text, #30251f);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 28%);
+}
+
+.banner-header,
+.team-identity {
+  display: flex;
+  align-items: center;
+}
+
+.banner-header {
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.team-identity { gap: 16px; }
+
+.team-identity img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.team-identity h2 {
+  margin: 0;
+  color: inherit;
+  font: 600 clamp(20px, 3vw, 26px)/1.2 Georgia, serif;
+}
+
+.close-button {
+  min-width: 110px;
+  min-height: 42px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #5f805c;
+  color: #fff;
+  font: 600 14px/1 Arial, sans-serif;
+  cursor: pointer;
+}
+
+.banner-message {
+  margin: 24px 0 0;
+  color: var(--app-muted, #746c66);
+  font: 400 clamp(16px, 2.2vw, 19px)/1.4 Arial, sans-serif;
+}
+
+@media (max-width: 520px) {
+  .banner-backdrop { padding: 16px; }
+  .team-banner { padding: 22px 18px; border-radius: 16px; }
+  .team-identity { gap: 10px; }
+  .team-identity img { width: 40px; height: 40px; }
+  .close-button { min-width: 78px; padding: 0 14px; }
+}

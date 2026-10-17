@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { TeamBannerComponent } from '../components/team-banner/team-banner.component';
+import { SettingsService } from '../services/settings.service';
 
 import {
   IonButton,
@@ -55,6 +57,7 @@ interface ApiProduct {
   styleUrls: ['./home.page.scss'],
   imports: [
     CommonModule,
+    TeamBannerComponent,
     RouterLink,
     IonButton,
     IonCard,
@@ -70,6 +73,7 @@ interface ApiProduct {
   ],
 })
 export class HomePage implements AfterViewInit, OnInit {
+  showTeamBanner = false;
   readonly features: HomeFeature[] = [
     {
       icon: 'assets/Images/Cart.png',
@@ -109,10 +113,26 @@ export class HomePage implements AfterViewInit, OnInit {
     private readonly http: HttpClient,
     private readonly router: Router,
     private readonly changeDetector: ChangeDetectorRef,
+    private readonly settings: SettingsService,
   ) {}
 
   ngOnInit(): void {
     void this.loadHomeProducts();
+  }
+
+  ionViewWillEnter(): void {
+    try {
+      if (sessionStorage.getItem('caravan.team-banner.pending') === 'true') {
+        sessionStorage.removeItem('caravan.team-banner.pending');
+        this.showTeamBanner = !this.settings.disableBanners();
+      }
+    } catch {
+      this.showTeamBanner = false;
+    }
+  }
+
+  closeTeamBanner(): void {
+    this.showTeamBanner = false;
   }
 
   async loadHomeProducts(): Promise<void> {

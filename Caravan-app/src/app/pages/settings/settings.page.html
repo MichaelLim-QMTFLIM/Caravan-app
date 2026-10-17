@@ -60,6 +60,21 @@
       </label>
     </section>
 
+    <section class="settings-card accessibility-card" aria-labelledby="announcements-title">
+      <div>
+        <h2 id="announcements-title">Team banners</h2>
+        <p>Choose whether Caravan Team announcements appear after you sign in.</p>
+      </div>
+      <label class="switch-control">
+        <span>Disable banners</span>
+        <input
+          type="checkbox"
+          [ngModel]="settings.disableBanners()"
+          (ngModelChange)="settings.setDisableBanners($event)"
+          aria-label="Disable team banners">
+      </label>
+    </section>
+
     <section class="settings-card accessibility-card" aria-labelledby="accessibility-title">
       <div>
         <h2 id="accessibility-title">Accessibility</h2>
