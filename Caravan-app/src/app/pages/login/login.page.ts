@@ -89,7 +89,10 @@ export class LoginPage implements OnInit, OnDestroy {
       this.router.navigateByUrl('/home');
     } catch (err: any) {
       // Non-2xx responses land here; use the server's error message if it sent one
-      this.showError(err?.error?.error ?? 'Something went wrong. Please try again.');
+      const message = typeof err?.error === 'string'
+        ? err.error
+        : (err?.error?.error || err?.error?.message || err?.message);
+      this.showError(message || 'Something went wrong. Please try again.');
     } finally {
       this.loading.set(false);
     }

@@ -31,17 +31,25 @@ function getReturnOrigin(value) {
   }
 }
 
+function getCallbackUrl(req) {
+  const host = req.get("host");
+  const protocol = req.protocol || "http";
+  return `${protocol}://${host}/api/auth/google/callback`;
+}
+
 function clearGoogleState(res) {
   const options = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/api/auth/google/callback" };
   res.clearCookie("google_oauth_state", options);
   res.clearCookie("google_oauth_return", options);
 }
 
-const googleClient = new OAuth2Client(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_CALLBACK_URL,
-);
+function getGoogleClient(req) {
+  const callbackUrl = getCallbackUrl(req);
+  return {
+    client: new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, callbackUrl),
+    callbackUrl,
+  };
+}
 
 app.customPath = "/api";
 
@@ -50,7 +58,7 @@ app.customPath = "/api";
  * Send the user to Google
  */
 app.get("/auth/google", (req, res) => {
-  console.log("Route hit: /auth/google");
+  console.log("Route hit: /auth/google from host:", req.get("host"));
   const state = crypto.randomBytes(24).toString("hex");
   const cookieOptions = {
     httpOnly: true,
@@ -61,11 +69,11 @@ app.get("/auth/google", (req, res) => {
   };
   res.cookie("google_oauth_state", state, cookieOptions);
   res.cookie("google_oauth_return", getReturnOrigin(req.query.returnTo), cookieOptions);
-  const url = googleClient.generateAuthUrl({
+
+  const { client } = getGoogleClient(req);
+  const url = client.generateAuthUrl({
     access_type: "offline",
-
     scope: ["openid", "email", "profile"],
-
     prompt: "select_account",
     state,
   });
@@ -89,16 +97,21 @@ app.get("/auth/google/callback", async (req, res) => {
       return res.redirect(`${frontendOrigin}/login?error=google_auth`);
     }
 
+    const { client, callbackUrl } = getGoogleClient(req);
+
     /*
      * Exchange Google's authorization code
      * for Google tokens.
      */
-    const { tokens } = await googleClient.getToken(code);
+    const { tokens } = await client.getToken({
+      code: String(code),
+      redirect_uri: callbackUrl,
+    });
 
     /*
      * Verify Google's ID token.
      */
-    const ticket = await googleClient.verifyIdToken({
+    const ticket = await client.verifyIdToken({
       idToken: tokens.id_token,
       audience: GOOGLE_CLIENT_ID,
     });
