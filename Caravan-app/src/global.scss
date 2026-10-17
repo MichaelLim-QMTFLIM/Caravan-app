@@ -80,6 +80,13 @@ html.ion-palette-dark ion-content {
   --color: var(--app-text);
 }
 
+/* Preserve the auth background artwork when dark mode sets a global content color. */
+html.ion-palette-dark app-login ion-content,
+html.ion-palette-dark app-register ion-content {
+  --background: linear-gradient(rgb(0 0 0 / 32%), rgb(0 0 0 / 32%)),
+    url('/assets/Images/Login_Background.jpg') center / cover no-repeat fixed !important;
+}
+
 html.ion-palette-dark ion-toolbar {
   --background: #21150e;
   --color: var(--app-text);
@@ -418,6 +425,18 @@ html.ion-palette-dark app-orderhistory .status-text,
 html.ion-palette-dark app-orderhistory .receipt-status { color: #a9c6ad !important; }
 
 /* Brighten hard-coded light-theme text that otherwise disappears on dark surfaces. */
+html.ion-palette-dark app-homepage .welcome,
+html.ion-palette-dark app-homepage .feature-item,
+html.ion-palette-dark app-homepage .feature-text,
+html.ion-palette-dark app-homepage .feature-text h3,
+html.ion-palette-dark app-homepage .feature-text p,
+html.ion-palette-dark app-homepage .section-title,
+html.ion-palette-dark app-homepage .cat-type { color: #f6eee7 !important; }
+html.ion-palette-dark app-homepage .hero .text-box { background: rgb(23 15 10 / 90%) !important; }
+html.ion-palette-dark app-homepage .feature-item img { filter: brightness(0) invert(1); }
+html.ion-palette-dark app-homepage .category:hover { background-color: #3a281b !important; }
+html.ion-palette-dark app-homepage .category:hover .cat-type { color: #f6eee7 !important; }
+
 html.ion-palette-dark app-product .product-info,
 html.ion-palette-dark app-product .product-title,
 html.ion-palette-dark app-product .product-origin,

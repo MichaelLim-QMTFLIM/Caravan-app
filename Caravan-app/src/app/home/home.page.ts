@@ -1,6 +1,8 @@
-import { AfterViewInit, Component, ElementRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Router, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import {
   IonButton,
@@ -29,9 +31,22 @@ interface HomeCategory {
 
 interface HomeProduct {
   id: number;
+  typeId?: number;
   name: string;
   price: number;
   image: string;
+  rating?: number;
+  reviewCount?: number;
+}
+
+interface ApiProduct {
+  product_id: number;
+  type_id: number;
+  product_name: string;
+  product_price: number;
+  product_image: string;
+  product_rating?: number;
+  review_count?: number;
 }
 
 @Component({
@@ -54,7 +69,7 @@ interface HomeProduct {
     IonRow,
   ],
 })
-export class HomePage implements AfterViewInit {
+export class HomePage implements AfterViewInit, OnInit {
   readonly features: HomeFeature[] = [
     {
       icon: 'assets/Images/Cart.png',
@@ -89,7 +104,51 @@ export class HomePage implements AfterViewInit {
   newArrivals: HomeProduct[] = [];
   popularProducts: HomeProduct[] = [];
 
-  constructor(private readonly host: ElementRef<HTMLElement>) {}
+  constructor(
+    private readonly host: ElementRef<HTMLElement>,
+    private readonly http: HttpClient,
+    private readonly router: Router,
+    private readonly changeDetector: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
+    void this.loadHomeProducts();
+  }
+
+  async loadHomeProducts(): Promise<void> {
+    try {
+      const rows = await firstValueFrom(this.http.get<ApiProduct[]>('/api/fetchProducts'));
+      const products: HomeProduct[] = rows.map(row => ({
+        id: Number(row.product_id),
+        typeId: Number(row.type_id),
+        name: row.product_name ?? 'Caravan product',
+        price: Number(row.product_price) || 0,
+        image: row.product_image || 'assets/Images/ItemNotFound_nobg.png',
+        rating: Number(row.product_rating) || 0,
+        reviewCount: Number(row.review_count) || 0,
+      }));
+
+      // Product IDs are assigned as new products are created, so descending IDs
+      // provide a stable newest-first order until the API exposes a created date.
+      this.newArrivals = [...products].sort((a, b) => b.id - a.id).slice(0, 3);
+      this.popularProducts = [...products]
+        .sort((a, b) => Number(b.rating) - Number(a.rating)
+          || Number(b.reviewCount) - Number(a.reviewCount)
+          || b.id - a.id)
+        .slice(0, 3);
+    } catch (error) {
+      console.error('Unable to load home page products:', error);
+      this.newArrivals = [];
+      this.popularProducts = [];
+    } finally {
+      this.changeDetector.detectChanges();
+    }
+  }
+
+  openProduct(product: HomeProduct): void {
+    const idParam = product.typeId === 2 ? 'bundleId' : 'productId';
+    void this.router.navigate(['/product'], { queryParams: { [idParam]: product.id } });
+  }
 
   ngAfterViewInit(): void {
     if (typeof IntersectionObserver === 'undefined') {
