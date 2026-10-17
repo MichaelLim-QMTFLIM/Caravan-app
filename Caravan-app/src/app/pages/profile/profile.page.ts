@@ -52,8 +52,10 @@ interface WishlistItem {
 })
 export class ProfilePage implements OnInit {
   private readonly addressesPerPage = 5;
+  private readonly wishlistItemsPerPage = 5;
   activeTab: ProfileTab = 'overview';
   addressPage = 1;
+  wishlistPage = 1;
   customerName = '';
   customerEmail = '';
   isEditingProfile = false;
@@ -93,6 +95,9 @@ export class ProfilePage implements OnInit {
     if (this.route.snapshot.queryParamMap.get('tab') === 'addresses') {
       this.activeTab = 'addresses';
     }
+  }
+
+  ionViewWillEnter(): void {
     void this.loadProfileData();
   }
 
@@ -115,6 +120,27 @@ export class ProfilePage implements OnInit {
   get paginatedAddresses(): Address[] {
     const start = (this.addressPage - 1) * this.addressesPerPage;
     return this.addresses.slice(start, start + this.addressesPerPage);
+  }
+
+  get wishlistPageCount(): number {
+    return Math.max(1, Math.ceil(this.wishlistItems.length / this.wishlistItemsPerPage));
+  }
+
+  get paginatedWishlistItems(): WishlistItem[] {
+    const start = (this.wishlistPage - 1) * this.wishlistItemsPerPage;
+    return this.wishlistItems.slice(start, start + this.wishlistItemsPerPage);
+  }
+
+  previousWishlistPage(): void {
+    if (this.wishlistPage > 1) this.wishlistPage--;
+  }
+
+  nextWishlistPage(): void {
+    if (this.wishlistPage < this.wishlistPageCount) this.wishlistPage++;
+  }
+
+  private clampWishlistPage(): void {
+    this.wishlistPage = Math.min(this.wishlistPage, this.wishlistPageCount);
   }
 
   previousAddressPage(): void {
@@ -166,6 +192,7 @@ export class ProfilePage implements OnInit {
         image: item.product_image || 'assets/images/product-placeholder.png',
         typeId: Number(item.type_id) || 1,
       }));
+      this.clampWishlistPage();
     } catch (error: any) {
       console.error('Unable to load profile data:', error);
       this.error = error?.status === 401
@@ -343,6 +370,7 @@ export class ProfilePage implements OnInit {
     try {
       await firstValueFrom(this.http.delete(`/api/removeWishlist/${itemId}`));
       this.wishlistItems = this.wishlistItems.filter(item => item.id !== itemId);
+      this.clampWishlistPage();
       this.cancelDeleteWishlistItem();
     } catch (error: any) {
       console.error('Wishlist removal failed:', error);

@@ -52,16 +52,19 @@
 }
 
 :root.ion-palette-dark {
-  --color-secondary: #191715;
-  --color-text-light: #f3eee8;
-  --app-background: #191715;
-  --app-surface: #262320;
-  --app-input: #302c28;
-  --app-text: #f3eee8;
-  --app-muted: #c0b5aa;
-  --app-border: #4b433c;
-  --ion-background-color: #191715;
-  --ion-text-color: #f3eee8;
+  --color-primary: #4b3021;
+  --color-secondary: #170f0a;
+  --color-green-card: #23402d;
+  --color-image-bg: #35251a;
+  --color-text-light: #f6eee7;
+  --app-background: #170f0a;
+  --app-surface: #241810;
+  --app-input: #302016;
+  --app-text: #f6eee7;
+  --app-muted: #c9b9ab;
+  --app-border: #4a3425;
+  --ion-background-color: #170f0a;
+  --ion-text-color: #f6eee7;
   color-scheme: dark;
 }
 
@@ -78,38 +81,39 @@ html.ion-palette-dark ion-content {
 }
 
 html.ion-palette-dark ion-toolbar {
-  --background: #24211e;
+  --background: #21150e;
   --color: var(--app-text);
 }
 
 html.ion-palette-dark .app-sidebar {
-  --background: #211e1b;
-  --ion-background-color: #211e1b;
-  --caravan-ink: #f3eee8;
+  --background: #1d130c;
+  --ion-background-color: #1d130c;
+  --caravan-ink: #f6eee7;
 }
 
 html.ion-palette-dark .app-header ion-menu-button,
 html.ion-palette-dark .app-header ion-button,
 html.ion-palette-dark .toolbar-brand,
 html.ion-palette-dark .app-sidebar ion-item {
-  color: #f3eee8;
+  color: #f6eee7;
 }
 
 html.ion-palette-dark app-settings {
-  --app-background: #191715;
-  --app-surface: #262320;
-  --app-input: #302c28;
-  --app-text: #f3eee8;
-  --app-muted: #c0b5aa;
-  --app-border: #4b433c;
+  --app-background: #170f0a;
+  --app-surface: #241810;
+  --app-input: #302016;
+  --app-text: #f6eee7;
+  --app-muted: #c9b9ab;
+  --app-border: #4a3425;
 }
 
 html.ion-palette-dark app-cart {
-  --caravan-cream: #191715;
-  --caravan-dark-brown: #e6d5c6;
-  --field-background: #302c28;
-  --border-colour: #4b433c;
-  --text-colour: #f3eee8;
+  --caravan-cream: #170f0a;
+  --caravan-dark-brown: #ead9ca;
+  --caravan-green: #23402d;
+  --field-background: #302016;
+  --border-colour: #4a3425;
+  --text-colour: #f6eee7;
 }
 
 html.ion-palette-dark app-cart .cart-section,
@@ -121,36 +125,45 @@ html.ion-palette-dark app-cart .empty-cart {
   color: var(--app-text);
 }
 
-html.ion-palette-dark app-cart .cart-item { border-color: var(--app-border); background: #302c28; }
+html.ion-palette-dark app-cart .cart-item { border-color: var(--app-border); background: #302016; }
 html.ion-palette-dark app-cart .product-information h3,
 html.ion-palette-dark app-cart .page-header h1,
 html.ion-palette-dark app-cart .empty-cart h3 { color: var(--app-text); }
+html.ion-palette-dark app-cart .product-information p { color: #cecece !important; }
+html.ion-palette-dark app-cart .product-information strong,
+html.ion-palette-dark app-cart .item-subtotal { color: #f6eee7 !important; }
 html.ion-palette-dark app-cart select { border-color: var(--app-border); background: var(--app-input); color: var(--app-text); }
 
 html.ion-palette-dark app-store {
-  --color-secondary: #191715;
-  --text-color: #f3eee8;
+  --color-primary: #493021;
+  --color-secondary: #170f0a;
+  --color-green-card: #23402d;
+  --color-image-bg: #35251a;
+  --text-color: #f6eee7;
 }
 
 html.ion-palette-dark app-store .function-bar,
-html.ion-palette-dark app-store .category-sidebar { border-color: var(--app-border); background: #211e1b; }
+html.ion-palette-dark app-store .category-sidebar { border-color: var(--app-border); background: #1d130c; }
+html.ion-palette-dark app-store .function-bar { border-color: var(--app-border); background: #1d130cee; }
 html.ion-palette-dark app-store .searchbar,
 html.ion-palette-dark app-store .filter-control select,
-html.ion-palette-dark app-store .price-filter input { border-color: var(--app-border); background: #302c28; color: var(--app-text); }
+html.ion-palette-dark app-store .price-filter input { border-color: var(--app-border); background: #302016; color: var(--app-text); }
 html.ion-palette-dark app-store .price-filter legend,
 html.ion-palette-dark app-store .price-filter label,
 html.ion-palette-dark app-store .category-sidebar h2,
 html.ion-palette-dark app-store .category-option,
 html.ion-palette-dark app-store .section-title { color: var(--app-text); }
 html.ion-palette-dark app-store .category-option:hover,
-html.ion-palette-dark app-store .category-option.active { background: #41382f; color: #f3eee8; }
+html.ion-palette-dark app-store .category-option.active { background: #3a281b; color: #f6eee7; }
 
 html.ion-palette-dark app-profile {
-  --caravan-cream: #211e1b;
-  --card-background: #302c28;
-  --field-background: #302c28;
-  --border-colour: #4b433c;
-  --text-colour: #f3eee8;
+  --caravan-cream: #1d130c;
+  --caravan-brown: #493021;
+  --caravan-brown-dark: #352215;
+  --card-background: #241810;
+  --field-background: #302016;
+  --border-colour: #4a3425;
+  --text-colour: #f6eee7;
 }
 html.ion-palette-dark app-profile .profile-wrapper,
 html.ion-palette-dark app-profile .profile-card,
@@ -159,22 +172,297 @@ html.ion-palette-dark app-profile .wishlist-card,
 html.ion-palette-dark app-profile .voucher-card { background: var(--app-surface); color: var(--app-text); }
 
 html.ion-palette-dark app-orderhistory {
-  --caravan-cream: #191715;
-  --text-color: #f3eee8;
-  --muted-color: #c0b5aa;
+  --caravan-cream: #170f0a;
+  --caravan-brown: #493021;
+  --caravan-green: #23402d;
+  --text-color: #f6eee7;
+  --muted-color: #c9b9ab;
 }
 html.ion-palette-dark app-orderhistory .orders-list,
 html.ion-palette-dark app-orderhistory .order-card,
 html.ion-palette-dark app-orderhistory .receipt-modal { border-color: var(--app-border); background: var(--app-surface); color: var(--app-text); }
+html.ion-palette-dark app-orderhistory h1,
+html.ion-palette-dark app-orderhistory h2,
+html.ion-palette-dark app-orderhistory dt,
+html.ion-palette-dark app-orderhistory .close-modal,
+html.ion-palette-dark app-orderhistory label,
+html.ion-palette-dark app-orderhistory span { color: #fff !important; }
+html.ion-palette-dark app-orderhistory select,
+html.ion-palette-dark app-orderhistory option,
+html.ion-palette-dark app-orderhistory input,
+html.ion-palette-dark app-orderhistory textarea {
+  border-color: #d6c6b5 !important;
+  background: #f1e7dc !important;
+  color: #392619 !important;
+}
+html.ion-palette-dark app-orderhistory .state-message { color: #392619 !important; }
+html.ion-palette-dark app-orderhistory .refund-modal {
+  border: 1px solid var(--app-border);
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+html.ion-palette-dark app-orderhistory .refund-modal .modal-header h2,
+html.ion-palette-dark app-orderhistory .refund-modal .already-requested-message { color: #fff !important; }
+html.ion-palette-dark app-orderhistory .refund-modal .close-modal { color: #fff !important; }
+html.ion-palette-dark app-orderhistory .refund-modal input,
+html.ion-palette-dark app-orderhistory .refund-modal textarea {
+  border-color: #d6c6b5 !important;
+  background: #f1e7dc !important;
+  color: #392619 !important;
+}
+html.ion-palette-dark app-orderhistory .refund-modal input::placeholder,
+html.ion-palette-dark app-orderhistory .refund-modal textarea::placeholder { color: #75675b !important; opacity: 1; }
+html.ion-palette-dark app-orderhistory .refund-modal .cancel-btn {
+  border: 1px solid #d6c6b5;
+  background: #302016;
+  color: #f6eee7;
+}
 
 html.ion-palette-dark app-product {
-  --color-secondary: #191715;
-  --color-image-bg: #302c28;
+  --color-primary: #493021;
+  --color-secondary: #170f0a;
+  --color-green-card: #23402d;
+  --color-image-bg: #35251a;
 }
 html.ion-palette-dark app-product .recommendations-section,
 html.ion-palette-dark app-product .recommendation-card,
 html.ion-palette-dark app-product .product-action-modal { border-color: var(--app-border); background: var(--app-surface); color: var(--app-text); }
 html.ion-palette-dark app-product .recommendations-section h2 { color: var(--app-text); }
+
+html.ion-palette-dark app-settings .settings-icon { background: #38271a; color: #e8c9a8; }
+html.ion-palette-dark app-settings .setting-control select { border-color: var(--app-border); background: var(--app-input); color: var(--app-text); }
+html.ion-palette-dark app-product .review-btn { background: #302016; color: #d7e4d9; }
+html.ion-palette-dark app-product .wishlist-btn:hover:not(:disabled) { background: #302016; color: #f6eee7; }
+html.ion-palette-dark app-reviews {
+  --color-secondary: #170f0a;
+  --color-primary: #493021;
+  --color-text-dark: #f6eee7;
+  --color-text-muted: #c9b9ab;
+  --color-border-gray: #4a3425;
+}
+html.ion-palette-dark app-reviews ion-content { --background: #170f0a; color: #f6eee7; }
+html.ion-palette-dark app-reviews .page-header h1,
+html.ion-palette-dark app-reviews .product-details h2,
+html.ion-palette-dark app-reviews .your-review-heading h2,
+html.ion-palette-dark app-reviews .origin-text,
+html.ion-palette-dark app-reviews .description-text,
+html.ion-palette-dark app-reviews .score-text,
+html.ion-palette-dark app-reviews .review-count,
+html.ion-palette-dark app-reviews .your-rating,
+html.ion-palette-dark app-reviews .your-review-card h3,
+html.ion-palette-dark app-reviews .your-review-text,
+html.ion-palette-dark app-reviews .reviewer-name,
+html.ion-palette-dark app-reviews .review-rating,
+html.ion-palette-dark app-reviews .review-title,
+html.ion-palette-dark app-reviews .review-comment,
+html.ion-palette-dark app-reviews .review-date,
+html.ion-palette-dark app-reviews .pagination,
+html.ion-palette-dark app-reviews .pagination span,
+html.ion-palette-dark app-reviews .no-reviews { color: #f6eee7 !important; }
+html.ion-palette-dark app-reviews .review-count,
+html.ion-palette-dark app-reviews .review-date { color: #c9b9ab !important; }
+html.ion-palette-dark app-reviews .product-overview-card,
+html.ion-palette-dark app-reviews .your-review-card,
+html.ion-palette-dark app-reviews .review-card,
+html.ion-palette-dark app-reviews .dialog-box,
+html.ion-palette-dark app-reviews .confirm-box,
+html.ion-palette-dark app-reviews .page-error {
+  border: 1px solid #4a3425;
+  background: #241810 !important;
+  color: #f6eee7 !important;
+}
+html.ion-palette-dark app-reviews .your-review-heading h2 { color: #f6eee7 !important; }
+html.ion-palette-dark app-reviews .modal-header h2,
+html.ion-palette-dark app-reviews .form-field-group label,
+html.ion-palette-dark app-reviews .confirm-box > p { color: #f6eee7 !important; }
+html.ion-palette-dark app-reviews .close-modal { color: #fff !important; }
+html.ion-palette-dark app-reviews .radius-10-input,
+html.ion-palette-dark app-reviews .custom-input-box {
+  border-color: #d6c6b5 !important;
+  background: #f1e7dc !important;
+  color: #392619 !important;
+  caret-color: #392619;
+}
+html.ion-palette-dark app-reviews .radius-10-input::placeholder,
+html.ion-palette-dark app-reviews .custom-input-box::placeholder { color: #75675b !important; opacity: 1; }
+html.ion-palette-dark app-reviews .cancel-btn { border: 1px solid #d6c6b5; background: #302016; color: #f6eee7; }
+html.ion-palette-dark app-reviews .edit-review-btn,
+html.ion-palette-dark app-reviews .save-btn { background: #23402d; color: #f6eee7; }
+html.ion-palette-dark app-reviews .delete-btn { background: #a92b3c; color: #fff; }
+html.ion-palette-dark app-reviews .loading-overlay { background: rgb(246 237 226 / 94%); color: #392619; }
+html.ion-palette-dark app-reviews .loading-overlay span { color: #392619; }
+html.ion-palette-dark app-reviews .loading-overlay ion-spinner { --color: #51331f; }
+html.ion-palette-dark app-reviews ::selection { background: #e2b02b; color: #170f0a; }
+
+/* Keep the shared toolbar and page headings legible against the espresso palette. */
+html.ion-palette-dark .app-header ion-toolbar {
+  --background: #1b1009 !important;
+  --color: #f7eee5 !important;
+  border-bottom-color: #4a3425;
+}
+html.ion-palette-dark .toolbar-brand,
+html.ion-palette-dark .app-header ion-menu-button,
+html.ion-palette-dark .app-header ion-button { color: #f7eee5 !important; --color: #f7eee5; }
+html.ion-palette-dark .toolbar-brand span { color: #f1d8b6; }
+html.ion-palette-dark .sidebar-brand p,
+html.ion-palette-dark .sidebar-section-label { color: #c9b9ab; }
+
+/* Loading screens use a light surface with dark text for clear status contrast. */
+html.ion-palette-dark app-product .loading-overlay,
+html.ion-palette-dark app-profile .profile-loading-overlay,
+html.ion-palette-dark app-cart .loading-overlay,
+html.ion-palette-dark app-orderhistory .orders-loading-overlay {
+  background: rgb(246 237 226 / 94%) !important;
+  color: #392619 !important;
+}
+html.ion-palette-dark app-product .loading-overlay p,
+html.ion-palette-dark app-profile .profile-loading-overlay p,
+html.ion-palette-dark app-cart .loading-overlay p,
+html.ion-palette-dark app-orderhistory .orders-loading-overlay p { color: #392619 !important; font-weight: 700; }
+html.ion-palette-dark app-product .loading-overlay ion-spinner,
+html.ion-palette-dark app-profile .profile-loading-overlay ion-spinner,
+html.ion-palette-dark app-cart .loading-overlay ion-spinner,
+html.ion-palette-dark app-orderhistory .orders-loading-overlay ion-spinner { --color: #51331f !important; }
+
+/* Dialogs stay dark; editable fields use a light surface and dark readable text. */
+html.ion-palette-dark app-profile .modal-box,
+html.ion-palette-dark app-profile .modal-header h3,
+html.ion-palette-dark app-profile .modal-box > p,
+html.ion-palette-dark app-profile .modal-box > h3,
+html.ion-palette-dark app-profile .modal-box label,
+html.ion-palette-dark app-cart .modal-box,
+html.ion-palette-dark app-product .product-action-modal,
+html.ion-palette-dark app-register .privacy-modal,
+html.ion-palette-dark app-reviews .dialog-box,
+html.ion-palette-dark app-reviews .confirm-box {
+  border-color: #4a3425;
+  background: #241810 !important;
+  color: #f6eee7 !important;
+}
+html.ion-palette-dark app-profile .modal-box input,
+html.ion-palette-dark app-profile .profile-card input,
+html.ion-palette-dark app-profile .modal-box textarea,
+html.ion-palette-dark app-store .searchbar,
+html.ion-palette-dark app-store .filter-control select,
+html.ion-palette-dark app-store .price-filter input,
+html.ion-palette-dark app-cart select,
+html.ion-palette-dark app-reviews input,
+html.ion-palette-dark app-reviews textarea,
+html.ion-palette-dark app-register .form-input {
+  border-color: #d6c6b5 !important;
+  background: #f1e7dc !important;
+  color: #392619 !important;
+  caret-color: #392619;
+}
+html.ion-palette-dark app-cart .payment-option,
+html.ion-palette-dark app-cart .payment-option.selected {
+  border-color: #d6c6b5 !important;
+  background: #f1e7dc !important;
+  color: #392619 !important;
+}
+html.ion-palette-dark app-cart .payment-option.selected { border-color: #23402d !important; }
+html.ion-palette-dark app-cart .payment-copy strong,
+html.ion-palette-dark app-cart .payment-copy small,
+html.ion-palette-dark app-cart .payment-icon { color: #392619 !important; }
+html.ion-palette-dark app-cart .selection-circle { border-color: #8b8178; }
+html.ion-palette-dark app-cart .payment-option.selected .selection-circle { border-color: #23402d; }
+html.ion-palette-dark app-profile input::placeholder,
+html.ion-palette-dark app-profile textarea::placeholder,
+html.ion-palette-dark app-store input::placeholder,
+html.ion-palette-dark app-reviews input::placeholder,
+html.ion-palette-dark app-reviews textarea::placeholder,
+html.ion-palette-dark app-register input::placeholder { color: #75675b !important; opacity: 1; }
+html.ion-palette-dark app-profile .modal-box .delete-wishlist-preview,
+html.ion-palette-dark app-profile .modal-box .address-preview { color: #392619; }
+
+/* Several informational pages have fixed light-mode text colors in component SCSS. */
+html.ion-palette-dark app-faqs .faq-page h1,
+html.ion-palette-dark app-faqs .faq-section h2,
+html.ion-palette-dark app-faqs .contact-section h2,
+html.ion-palette-dark app-faqs .order-note,
+html.ion-palette-dark app-aboutus .team-title,
+html.ion-palette-dark app-aboutus .team-name,
+html.ion-palette-dark app-aboutus .about-title,
+html.ion-palette-dark app-aboutus .about-subtitle,
+html.ion-palette-dark app-aboutus .mission-vision-title,
+html.ion-palette-dark app-aboutus .mission-vision-text { color: #f6eee7 !important; }
+html.ion-palette-dark app-faqs .faq-item,
+html.ion-palette-dark app-faqs .faq-answer,
+html.ion-palette-dark app-faqs .faq-answer p,
+html.ion-palette-dark app-faqs .contact-card,
+html.ion-palette-dark app-aboutus .mission-vision { border-color: #4a3425; background: #241810 !important; }
+html.ion-palette-dark app-faqs .faq-answer p,
+html.ion-palette-dark app-faqs .contact-card p,
+html.ion-palette-dark app-faqs .contact-card a { color: #e0d2c4 !important; }
+html.ion-palette-dark app-faqs .contact-card a.contact-button,
+html.ion-palette-dark app-faqs .contact-card a.contact-button:hover,
+html.ion-palette-dark app-faqs .contact-card a.contact-button:focus-visible {
+  background: #d5b993 !important;
+  color: #392619 !important;
+}
+html.ion-palette-dark app-faqs .contact-card a.contact-button:focus-visible {
+  outline: 3px solid #f6eee7;
+  outline-offset: 2px;
+}
+html.ion-palette-dark app-faqs .faq-question { background: #493021; color: #fff8f1; }
+html.ion-palette-dark app-aboutus .decorative-line { background: #d8c2aa; }
+
+/* Use the darker forest accent instead of the light-mode green on action/status elements. */
+html.ion-palette-dark app-cart .quantity-control button,
+html.ion-palette-dark app-cart .checkout-btn,
+html.ion-palette-dark app-cart .primary-btn,
+html.ion-palette-dark app-orderhistory .refund-btn,
+html.ion-palette-dark app-reviews .edit-review-btn,
+html.ion-palette-dark app-reviews .save-btn { background: #23402d !important; color: #f6eee7 !important; }
+html.ion-palette-dark app-orderhistory .status-text,
+html.ion-palette-dark app-orderhistory .receipt-status { color: #a9c6ad !important; }
+
+/* Brighten hard-coded light-theme text that otherwise disappears on dark surfaces. */
+html.ion-palette-dark app-product .product-info,
+html.ion-palette-dark app-product .product-title,
+html.ion-palette-dark app-product .product-origin,
+html.ion-palette-dark app-product .product-description,
+html.ion-palette-dark app-product .product-price,
+html.ion-palette-dark app-product .size-selector label,
+html.ion-palette-dark app-product .recommendations-section h2,
+html.ion-palette-dark app-product .product-action-modal h2,
+html.ion-palette-dark app-product .product-action-modal p { color: #f6eee7 !important; }
+
+html.ion-palette-dark app-store .price-filter legend,
+html.ion-palette-dark app-store .price-filter label,
+html.ion-palette-dark app-store .category-sidebar h2,
+html.ion-palette-dark app-store .category-option,
+html.ion-palette-dark app-store .tab-button,
+html.ion-palette-dark app-store .section-title,
+html.ion-palette-dark app-store .product-name,
+html.ion-palette-dark app-store .product-price,
+html.ion-palette-dark app-store .rating-label,
+html.ion-palette-dark app-store .content-loader,
+html.ion-palette-dark app-store .noitem-content h2,
+html.ion-palette-dark app-store .pagination label,
+html.ion-palette-dark app-store .page-count { color: #f6eee7 !important; }
+html.ion-palette-dark app-store .price-filter input::placeholder,
+html.ion-palette-dark app-store .searchbar::placeholder { color: #75675b !important; opacity: 1; }
+
+html.ion-palette-dark app-profile .profile-name,
+html.ion-palette-dark app-profile .profile-email,
+html.ion-palette-dark app-profile .content-section h2,
+html.ion-palette-dark app-profile .form-group label,
+html.ion-palette-dark app-profile .form-note,
+html.ion-palette-dark app-profile .address-card strong,
+html.ion-palette-dark app-profile .address-card p,
+html.ion-palette-dark app-profile .address-card small,
+html.ion-palette-dark app-profile .voucher-card strong,
+html.ion-palette-dark app-profile .voucher-card p,
+html.ion-palette-dark app-profile .voucher-card small,
+html.ion-palette-dark app-profile .simple-action-box p,
+html.ion-palette-dark app-profile .wishlist-information strong,
+html.ion-palette-dark app-profile .wishlist-information > span,
+html.ion-palette-dark app-profile .empty-message { color: #f6eee7 !important; }
+html.ion-palette-dark app-profile .form-group input[readonly] { color: #f6eee7 !important; }
+html.ion-palette-dark app-profile .edit-outline-btn { border-color: #d6c6b5; color: #f1e7dc; }
+html.ion-palette-dark app-profile .address-pagination { color: #f6eee7; }
+html.ion-palette-dark app-profile .address-pagination .pagination-btn { border-color: #d6c6b5; background: #f1e7dc; color: #392619; }
 
 html.reduce-motion *,
 html.reduce-motion *::before,

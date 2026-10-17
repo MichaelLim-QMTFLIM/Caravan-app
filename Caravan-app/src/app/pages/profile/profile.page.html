@@ -263,7 +263,7 @@
           <h2>My Wishlist</h2>
 
           <div class="wishlist-list">
-            @for (item of wishlistItems; track item.id) {
+            @for (item of paginatedWishlistItems; track item.id) {
               <div class="wishlist-card">
                 <img
                   [src]="item.image"
@@ -300,6 +300,26 @@
               </div>
             }
           </div>
+
+          @if (wishlistPageCount > 1) {
+            <nav class="address-pagination wishlist-pagination" aria-label="Wishlist pages">
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="previousWishlistPage()"
+                [disabled]="wishlistPage === 1">
+                Previous
+              </button>
+              <span aria-live="polite">Page {{ wishlistPage }} of {{ wishlistPageCount }}</span>
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="nextWishlistPage()"
+                [disabled]="wishlistPage === wishlistPageCount">
+                Next
+              </button>
+            </nav>
+          }
         </section>
       }
 
