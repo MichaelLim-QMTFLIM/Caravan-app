@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TeamBannerComponent } from '../components/team-banner/team-banner.component';
 import { SettingsService } from '../services/settings.service';
+import { SiteFooterComponent } from '../components/site-footer/site-footer.component';
 
 import {
   IonButton,
@@ -58,6 +59,7 @@ interface ApiProduct {
   imports: [
     CommonModule,
     TeamBannerComponent,
+    SiteFooterComponent,
     RouterLink,
     IonButton,
     IonCard,

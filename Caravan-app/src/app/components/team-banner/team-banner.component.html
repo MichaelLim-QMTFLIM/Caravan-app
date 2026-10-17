@@ -12,9 +12,6 @@
       </div>
       <button class="close-button" type="button" (click)="dismiss.emit()">Close</button>
     </header>
-    <p class="banner-message">
-      Welcome to Caravan! We’re glad you’re here. Explore our herbs, spices, and curated bundles,
-      and keep an eye out for more updates from the Caravan Team.
-    </p>
+    <p class="banner-message" role="status">{{ loading ? 'Loading...' : (message || 'Content unavailable.') }}</p>
   </section>
 </div>

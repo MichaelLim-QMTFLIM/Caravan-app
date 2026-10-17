@@ -5,7 +5,9 @@
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node scripts/dev.js",
+    "start:web": "ng serve --port 8100",
+    "start:api": "npm --prefix backend start",
     "build": "ng build",
     "android:sync:debug": "ng build --configuration development && cap sync android",
     "watch": "ng build --watch --configuration development",

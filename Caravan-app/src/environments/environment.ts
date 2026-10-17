@@ -4,6 +4,8 @@
 
 export const environment = {
   production: false,
+  // Use the embedded API process directly in browser development.
+  browserApiBaseUrl: 'http://localhost:3000',
   // Android Studio emulator host alias. For a physical device, use the
   // development computer's LAN IP or switch to localhost with `adb reverse`.
   androidApiBaseUrl: 'http://10.0.2.2:3000',

@@ -1,0 +1,31 @@
+<footer class="site-footer">
+  <section class="footer-contact" aria-labelledby="footer-contact-title">
+    <h2 id="footer-contact-title">Contact Information</h2>
+    <div class="footer-contact-grid">
+      <div class="footer-contact-item">
+        <h3>Location</h3>
+        <p>{{ loading ? 'Loading...' : (location?.mainText || (unavailable ? 'Content unavailable.' : 'Location information unavailable.')) }}</p>
+      </div>
+      <div class="footer-contact-item">
+        <h3>Email</h3>
+        @if (loading) {
+          <p>Loading...</p>
+        } @else if (email) {
+          <a [href]="'mailto:' + email.mainText">{{ email.mainText }}</a>
+        } @else {
+          <p>{{ unavailable ? 'Content unavailable.' : 'Email information unavailable.' }}</p>
+        }
+      </div>
+      <div class="footer-contact-item">
+        <h3>Number</h3>
+        @if (loading) {
+          <p>Loading...</p>
+        } @else if (phone) {
+          <a [href]="phoneHref()">{{ phone.mainText }}</a>
+        } @else {
+          <p>{{ unavailable ? 'Content unavailable.' : 'Phone information unavailable.' }}</p>
+        }
+      </div>
+    </div>
+  </section>
+</footer>

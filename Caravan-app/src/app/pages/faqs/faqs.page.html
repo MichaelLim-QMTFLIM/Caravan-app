@@ -7,21 +7,27 @@
         <h2 id="self-service-heading">Self-Service FAQs</h2>
 
         <div class="faq-list">
-          @for (item of faqs; track item.question; let i = $index) {
-            <article class="faq-item" [class.is-open]="openIndex === i">
-              <button
-                class="faq-question"
-                type="button"
-                [attr.aria-expanded]="openIndex === i"
-                (click)="toggle(i)"
-              >
-                <span>{{ item.question }}</span>
-                <span class="faq-chevron" aria-hidden="true"></span>
-              </button>
-              <div class="faq-answer">
-                <p>{{ item.answer }}</p>
-              </div>
-            </article>
+          @if (faqLoading) {
+            <p class="content-loading" role="status">Loading...</p>
+          } @else if (faqUnavailable) {
+            <p class="content-loading" role="status">Content unavailable.</p>
+          } @else {
+            @for (item of faqs; track item.question; let i = $index) {
+              <article class="faq-item" [class.is-open]="openIndex === i">
+                <button
+                  class="faq-question"
+                  type="button"
+                  [attr.aria-expanded]="openIndex === i"
+                  (click)="toggle(i)"
+                >
+                  <span>{{ item.question }}</span>
+                  <span class="faq-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="faq-answer">
+                  <p>{{ item.answer }}</p>
+                </div>
+              </article>
+            }
           }
         </div>
 
@@ -39,7 +45,13 @@
             <div>
               <h3>Live Chat</h3>
               <p>Connect with a support agent instantly.</p>
-              <a class="contact-button" href="mailto:CaravanSupport@gmail.com">Start Chat</a>
+              @if (contactsLoading) {
+                <span class="contact-button" aria-disabled="true">Loading...</span>
+              } @else if (email) {
+                <a class="contact-button" [href]="'mailto:' + email.mainText">Start Chat</a>
+              } @else {
+                <span class="contact-button" aria-disabled="true">Unavailable</span>
+              }
             </div>
           </div>
 
@@ -47,8 +59,14 @@
             <span class="contact-icon" aria-hidden="true">&#9993;</span>
             <div>
               <h3>Email Us</h3>
-              <p>Expect a response within 24 hours.</p>
-              <a class="contact-button" href="mailto:Caravan@gmail.com">Send Email</a>
+              @if (contactsLoading) {
+                <p>Loading...</p>
+              } @else if (email) {
+                <p>{{ email.mainText }}</p>
+                <a class="contact-button" [href]="'mailto:' + email.mainText">Send Email</a>
+              } @else {
+                <p>{{ contactsUnavailable ? 'Content unavailable.' : 'Email information unavailable.' }}</p>
+              }
             </div>
           </div>
 
@@ -56,8 +74,14 @@
             <span class="contact-icon" aria-hidden="true">&#9742;</span>
             <div>
               <h3>Call Us</h3>
-              <p>Available Mon-Fri, 9am - 5pm EST.</p>
-              <a class="contact-button" href="tel:+639123456789">Call +63 912 345 6789</a>
+              @if (contactsLoading) {
+                <p>Loading...</p>
+              } @else if (phone) {
+                <p>{{ phone.mainText }}</p>
+                <a class="contact-button" [href]="phoneHref()">Call {{ phone.mainText }}</a>
+              } @else {
+                <p>{{ contactsUnavailable ? 'Content unavailable.' : 'Phone information unavailable.' }}</p>
+              }
             </div>
           </div>
 
@@ -65,9 +89,14 @@
             <span class="contact-icon" aria-hidden="true">&#9673;</span>
             <div>
               <h3>Our Location</h3>
-              <p>
-                Visit our physical store in Philippines<br />
-                E. Rodriguez, Cubao, Philippines
+              <p class="contact-address">
+                @if (contactsLoading) {
+                  Loading...
+                } @else if (location) {
+                  {{ location.mainText }}
+                } @else {
+                  {{ contactsUnavailable ? 'Content unavailable.' : 'Location information unavailable.' }}
+                }
               </p>
             </div>
           </div>
@@ -75,4 +104,5 @@
       </section>
     </div>
   </main>
+  <app-site-footer></app-site-footer>
 </ion-content>

@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ContentService, SiteContent } from '../../services/content.service';
+import { SiteFooterComponent } from '../../components/site-footer/site-footer.component';
 
 import {
   IonButton,
@@ -25,35 +28,57 @@ interface FaqItem {
   templateUrl: './faqs.page.html',
   styleUrls: ['./faqs.page.scss'],
   standalone: true,
-  imports: [IonContent, RouterLink],
+  imports: [CommonModule, IonContent, RouterLink, SiteFooterComponent],
 })
-export class FaqPage {
+export class FaqPage implements OnInit {
   openIndex: number | null = 0; // first item open by default
+  faqs: FaqItem[] = [];
+  faqLoading = true;
+  faqUnavailable = false;
+  contactsLoading = true;
+  contactsUnavailable = false;
+  email?: SiteContent;
+  location?: SiteContent;
+  phone?: SiteContent;
 
-  faqs: FaqItem[] = [
-    {
-      question: 'Shipping & Delivery',
-      answer:
-        'Caravan offers Nationwide shipping, providing convenient and reliable delivery of your herbs, spices, and other products directly to your doorstep. All that is required is to provide your complete and accurate delivery address during checkout. Once your order has been confirmed, you can track its status through the order history page.',
-    },
-    {
-      question: 'Returns & Exchanges',
-      answer:
-        'Caravan accepts returns and exchanges for eligible orders that arrive damaged, incorrect, or defective. To request a return or exchange, provide your order details and the reason for your request through your account. Our team will review the request and provide further instructions on the return or exchange process.',
-    },
-    {
-      question: 'Product Questions',
-      answer:
-        "Learn more about Caravan's herbs, spices, and other products, including their origin, description, available sizes, prices, categories, and availability. You may reach us using our dedicated support email or phone number.",
-    },
-    {
-      question: 'My Account',
-      answer:
-        'Manage your Caravan account and keep your personal information up to date. You can use your account to view and manage your profile, check your order history, track current orders, manage your wishlist, and update your account details.',
-    },
-  ];
+  constructor(
+    private readonly contentService: ContentService,
+    private readonly changeDetector: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
+    void this.loadContent();
+  }
+
+  private async loadContent(): Promise<void> {
+    try {
+      const contents = await this.contentService.fetchAll();
+      const faqNames = ['Shipping & Delivery', 'Returns & Exchanges', 'Product Questions', 'My Account'];
+      this.faqs = contents
+        .filter(content => faqNames.includes(content.contentTypeName))
+        .map(content => ({ question: content.contentTypeName, answer: content.mainText }));
+      this.email = this.contentService.byTypeName(contents, 'Email');
+      this.location = this.contentService.byTypeName(contents, 'Location');
+      this.phone = this.contentService.byTypeName(contents, 'Number');
+      this.faqUnavailable = this.faqs.length === 0;
+      this.contactsUnavailable = !this.email && !this.location && !this.phone;
+    } catch (error) {
+      console.error('Unable to load FAQ and contact content:', error);
+      this.faqUnavailable = true;
+      this.contactsUnavailable = true;
+    } finally {
+      this.faqLoading = false;
+      this.contactsLoading = false;
+      this.changeDetector.detectChanges();
+    }
+  }
 
   toggle(index: number): void {
     this.openIndex = this.openIndex === index ? null : index;
+  }
+
+  phoneHref(): string | null {
+    const phoneNumber = this.phone?.mainText.replace(/[^\d+]/g, '');
+    return phoneNumber ? `tel:${phoneNumber}` : null;
   }
 }
