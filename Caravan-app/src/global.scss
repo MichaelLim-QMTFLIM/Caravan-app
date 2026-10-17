@@ -115,12 +115,13 @@ html.ion-palette-dark app-settings {
 }
 
 html.ion-palette-dark app-cart {
-  --caravan-cream: #170f0a;
+  --caravan-cream: #21160f;
   --caravan-dark-brown: #ead9ca;
   --caravan-green: #23402d;
   --field-background: #302016;
   --border-colour: #4a3425;
   --text-colour: #f6eee7;
+  --app-surface: #302016;
 }
 
 html.ion-palette-dark app-cart .cart-section,
@@ -132,10 +133,12 @@ html.ion-palette-dark app-cart .empty-cart {
   color: var(--app-text);
 }
 
-html.ion-palette-dark app-cart .cart-item { border-color: var(--app-border); background: #302016; }
+html.ion-palette-dark app-cart .cart-item { border-color: var(--app-border); background: #3a281b; }
 html.ion-palette-dark app-cart .product-information h3,
 html.ion-palette-dark app-cart .page-header h1,
-html.ion-palette-dark app-cart .empty-cart h3 { color: var(--app-text); }
+html.ion-palette-dark app-cart .empty-cart h3 { color: #fff8f1 !important; }
+html.ion-palette-dark app-cart .product-information h3 { color: #fff8f1 !important; }
+html.ion-palette-dark app-cart .page-header h1 { color: var(--app-text); }
 html.ion-palette-dark app-cart .product-information p { color: #cecece !important; }
 html.ion-palette-dark app-cart .product-information strong,
 html.ion-palette-dark app-cart .item-subtotal { color: #f6eee7 !important; }
@@ -479,6 +482,17 @@ html.ion-palette-dark app-profile .wishlist-information strong,
 html.ion-palette-dark app-profile .wishlist-information > span,
 html.ion-palette-dark app-profile .empty-message { color: #f6eee7 !important; }
 html.ion-palette-dark app-profile .form-group input[readonly] { color: #f6eee7 !important; }
+html.ion-palette-dark app-profile .content-section .form-group input:focus,
+html.ion-palette-dark app-profile .content-section .form-group input:focus-visible {
+  border-color: #d6c6b5 !important;
+  background: #f1e7dc !important;
+  color: #392619 !important;
+  caret-color: #392619 !important;
+}
+html.ion-palette-dark app-profile .content-section .form-group input::selection {
+  background: #6f4e37;
+  color: #ffffff;
+}
 html.ion-palette-dark app-profile .edit-outline-btn { border-color: #d6c6b5; color: #f1e7dc; }
 html.ion-palette-dark app-profile .address-pagination { color: #f6eee7; }
 html.ion-palette-dark app-profile .address-pagination .pagination-btn { border-color: #d6c6b5; background: #f1e7dc; color: #392619; }
